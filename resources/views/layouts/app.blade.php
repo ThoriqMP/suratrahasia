@@ -15,9 +15,9 @@
                 <div class="flex items-center justify-between">
                     <h1 class="text-2xl font-bold text-pink-600">MyLoveLetters</h1>
                     <div class="space-x-4">
-                        <a href="#" class="text-pink-600 hover:text-pink-700">Beranda</a>
-                        <a href="#" class="text-pink-600 hover:text-pink-700">Tentang</a>
-                        <a href="#" class="text-pink-600 hover:text-pink-700">Kontak</a>
+                        <a href="\" class="text-pink-600 hover:text-pink-700">Beranda</a>
+                        <a href="\tentang" class="text-pink-600 hover:text-pink-700">Tentang</a>
+                        <a href="\kontak" class="text-pink-600 hover:text-pink-700">Kontak</a>
                     </div>
                 </div>
             </nav>
@@ -26,7 +26,7 @@
         <!-- Main Content -->
         <main class="flex-1">
             <div class="max-w-4xl mx-auto px-2 sm:px-4 lg:px-2 py-4">
-                <div class="bg-white rounded-2xl shadow-xl ">
+                <div class="bg-white rounded-2xl shadow-xl p-8 md:p-12 lg:p-16">
                     @yield('content')
                 </div>
             </div>

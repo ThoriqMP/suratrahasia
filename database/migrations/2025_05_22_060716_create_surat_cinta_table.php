@@ -18,9 +18,10 @@ return new class extends Migration
             $table->string('untuk');
             $table->text('isi');
             $table->string('password');
+            $table->timestamp('dibuka_pada')->nullable();  // Waktu pertama kali surat dibuka
+            $table->integer('waktu_hapus')->nullable();    // Jumlah hari sebelum dihapus
             $table->timestamps();
         });
-
     }
 
     /**
@@ -30,5 +31,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('surat_cinta');
     }
-    
 };

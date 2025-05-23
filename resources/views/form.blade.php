@@ -7,7 +7,7 @@
         <div class="mt-2 text-lg font-normal text-pink-400">Ungkapkan Perasaanmu Disini</div>
     </h2>
 
-    <form action="/surat" method="POST" class="space-y-6 bg-white  rounded-xl ">
+    <form action="/surat" method="POST" class="space-y-6 bg-white rounded-xl p-6 mt-6 shadow-md">
         @csrf
         
         <div class="space-y-5">
@@ -42,6 +42,14 @@
                            focus:ring-2 focus:ring-pink-200 transition-all duration-200"
                     required>
                 <p class="mt-2 text-xs text-gray-500">Password ini akan digunakan untuk membuka surat</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-pink-700 mb-2">⏳ Hapus otomatis dalam berapa hari?</label>
+                <input type="number" name="waktu_hapus" min="1" max="30" placeholder="Misal: 7 (opsional)" 
+                    class="w-full px-4 py-3 border-2 border-pink-100 rounded-xl focus:border-pink-400 
+                           focus:ring-2 focus:ring-pink-200 transition-all duration-200">
+                <p class="mt-2 text-xs text-gray-500">Kosongkan jika ingin pakai default: 7 hari setelah dibuka / 3 hari jika tidak dibuka</p>
             </div>
         </div>
 
