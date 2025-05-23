@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Surat Cinta</title>
+    <link rel="icon" href   ="" class="fa fa-heart">
     @stack('scripts')
     @vite('resources/css/app.css')
 </head>

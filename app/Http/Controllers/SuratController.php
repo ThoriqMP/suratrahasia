@@ -12,7 +12,10 @@ class SuratController extends Controller
     public function create() {
         return view('form');
     }
-
+    public function index() {
+        return view('beranda');
+    }
+    
     public function store(Request $request) {
         $request->validate([
             'dari' => 'required|string|max:255',
