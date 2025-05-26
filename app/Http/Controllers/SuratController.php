@@ -86,4 +86,20 @@ class SuratController extends Controller
 
         return view('statistik', compact('jumlahSurat', 'jumlahDibuka'));
     }
+    public function searchForm()
+    {
+        return view('surat.cari');
+    }
+
+    public function search(Request $request)
+    {
+        $request->validate([
+            'kode' => 'required|string|max:8'
+        ]);
+
+        $surat = SuratCinta::where('kode', $request->kode)->first();
+
+        return view('surat.hasil', compact('surat'));
+    }
+
 }

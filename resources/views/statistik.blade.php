@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Statistik Surat Cinta</title>
-    <link rel="icon" href="" class="fa fa-heart">
+    <link rel="icon" href="" class="fa fa-heart" />
     @vite('resources/css/app.css')
 </head>
 <body class="bg-gradient-to-br from-pink-100 to-purple-200 min-h-screen flex items-center justify-center px-4">
@@ -27,6 +27,32 @@
             </div>
         </div>
 
+        <!-- Form Pencarian Surat -->
+        <div class="mt-8">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4 text-center">🔍 Cari Surat Berdasarkan Kode</h3>
+            <form action="{{ route('surat.search') }}" method="POST" class="flex flex-col sm:flex-row items-center gap-4">
+                @csrf
+                <input
+                    type="text"
+                    name="kode"
+                    maxlength="8"
+                    placeholder="Masukkan kode surat..."
+                    class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 transition"
+                    required
+                >
+                <button
+                    type="submit"
+                    class="px-6 py-3 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition font-semibold w-full sm:w-auto"
+                >
+                    Cari Surat
+                </button>
+            </form>
+
+            @if(session('error'))
+                <p class="mt-3 text-center text-red-500 font-medium">{{ session('error') }}</p>
+            @endif
+        </div>
+
         <div class="text-center mt-6">
             <a href="{{ route('statistik.form') }}"
                class="inline-block bg-pink-600 text-white px-6 py-2 rounded-full hover:bg-pink-700 transition">
@@ -44,6 +70,5 @@
             animation: fade-in 0.6s ease-out forwards;
         }
     </style>
-
 </body>
 </html>

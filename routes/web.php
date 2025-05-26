@@ -24,3 +24,8 @@ Route::fallback(function () {
 
 Route::get('/statistik', [SuratController::class, 'showStatistikForm'])->name('statistik.form');
 Route::post('/statistik', [SuratController::class, 'statistik'])->name('statistik.show');
+
+// Route pencarian surat
+Route::get('/cari', [SuratController::class, 'searchForm'])->name('surat.search.form');
+Route::post('/cari', [SuratController::class, 'search'])->name('surat.search');
+
