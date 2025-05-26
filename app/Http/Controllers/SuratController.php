@@ -68,4 +68,22 @@ class SuratController extends Controller
 
         return back()->with('error', 'Password salah!');
     }
+    public function showStatistikForm() {
+        return view('statistik_login');
+    }
+
+    public function statistik(Request $request) {
+        $request->validate([
+            'password' => 'required|string'
+        ]);
+
+        if ($request->password !== '010304Tmp') {
+            return back()->with('error', 'Password salah!');
+        }
+
+        $jumlahSurat = SuratCinta::count();
+        $jumlahDibuka = SuratCinta::whereNotNull('dibuka_pada')->count();
+
+        return view('statistik', compact('jumlahSurat', 'jumlahDibuka'));
+    }
 }

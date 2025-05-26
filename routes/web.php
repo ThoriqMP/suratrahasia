@@ -20,3 +20,6 @@ Route::get('/tentang', function () {
 Route::fallback(function () {
     return response()->view('notfound', [], 404);
 });
+
+Route::get('/statistik', [SuratController::class, 'showStatistikForm'])->name('statistik.form');
+Route::post('/statistik', [SuratController::class, 'statistik'])->name('statistik.show');
