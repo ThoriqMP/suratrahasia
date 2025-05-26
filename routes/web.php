@@ -20,7 +20,7 @@ Route::get('/tentang', function () {
     return view('tentang');
 });
 Route::get('/anonim', function () {
-    return view('anonim');
+    return view('pembuatan');
 });
 
 Route::fallback(function () {
