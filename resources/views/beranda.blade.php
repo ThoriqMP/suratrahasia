@@ -13,7 +13,7 @@
         <!-- Header -->
         <header class="bg-white shadow-sm relative z-50">
             <nav class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-                <h1 class="text-2xl font-bold text-pink-600">MyLoveLetters</h1>
+                <h1 class="text-2xl font-bold text-pink-600">BucininAja</h1>
                 <div class="space-x-4">
                     <a href="\" class="text-pink-600 hover:text-pink-700">Beranda</a>
                     <a href="\tentang" class="text-pink-600 hover:text-pink-700">Tentang</a>
@@ -31,9 +31,10 @@
                 <div class="text-center">
                     <h1 class="text-5xl font-semibold tracking-tight text-gray-900 sm:text-7xl">Surat Cinta Digital</h1>
                     <p class="mt-8 text-lg text-gray-500 sm:text-xl">Buat dan kirim surat cinta digital yang penuh makna. Karena setiap kata memiliki perasaan yang layak diabadikan.</p>
-                    <div class="mt-10 flex justify-center gap-x-6">
+                    <div class="mt-10 flex flex-col sm:flex-row justify-center gap-4 sm:gap-x-6">
                         <a href="/create" class="rounded-md bg-pink-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-pink-500">Tulis Surat</a>
-                        <a href="/tentang" class="text-sm font-semibold text-pink-600 hover:text-pink-800">Pelajari Lebih Lanjut <span aria-hidden="true">→</span></a>
+                        <a href="/anon" class="rounded-md bg-purple-500 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-purple-400">Pesan Anonim</a>
+                        <a href="/tentang" class="text-sm font-semibold text-pink-600 hover:text-pink-800 flex items-center gap-1">Pelajari Lebih Lanjut <span aria-hidden="true">→</span></a>
                     </div>
                 </div>
             </div>

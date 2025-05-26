@@ -14,7 +14,7 @@
         <header class="bg-white shadow-sm">
             <nav class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                 <div class="flex items-center justify-between">
-                    <h1 class="text-2xl font-bold text-pink-600">MyLoveLetters</h1>
+                    <h1 class="text-2xl font-bold text-pink-600">BucininAja</h1>
                     <div class="space-x-4">
                         <a href="\" class="text-pink-600 hover:text-pink-700">Beranda</a>
                         <a href="\tentang" class="text-pink-600 hover:text-pink-700">Tentang</a>

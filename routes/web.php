@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\SuratController;
+use App\Http\Controllers\AnonRoomController;
+use App\Http\Controllers\AnonMessageController;
 
 Route::get('/', [SuratController::class, 'index']);
 Route::get('/index', [SuratController::class, 'index']);
@@ -27,3 +29,13 @@ Route::post('/statistik', [SuratController::class, 'statistik'])->name('statisti
 
 
 Route::post('/statistik/cari', [SuratController::class, 'hasilPencarian'])->name('statistik.cari');
+
+Route::get('/anon', [AnonRoomController::class, 'createRoom'])->name('anon.create');
+Route::post('/anon', [AnonRoomController::class, 'storeRoom'])->name('anon.store');
+
+// untuk mengirim pesan (dibagikan ke orang lain)
+Route::get('/anon/send/{kode_form}', [AnonMessageController::class, 'showForm'])->name('anon.send.form');
+Route::post('/anon/send/{kode_form}', [AnonMessageController::class, 'store'])->name('anon.message.store');
+
+// untuk melihat pesan (hanya pemilik room)
+Route::get('/anon/{kode}', [AnonMessageController::class, 'showMessages'])->name('anon.show');
