@@ -5,7 +5,7 @@
     <h2 class="text-3xl font-bold text-pink-600 mb-4">📬 Kirim Pesan ke WhatsApp</h2>
     <p class="text-gray-600 mb-6">Kami menerima kritik dan saran terhadap website ini.</p>
 
-    <form id="whatsappForm" onsubmit="return sendToWhatsApp()" class="bg-pink-50 border border-pink-200 rounded-xl p-6 shadow-sm">
+    <form id="whatsappForm" onsubmit="return sendToWhatsApp()" class="bg-pink-50  rounded-xl p-6 shadow-sm">
         <div class="mb-4 text-left">
             <label class="block text-sm text-pink-700 font-semibold mb-2">Nama Kamu</label>
             <input type="text" id="nama" class="w-full px-4 py-3 border border-pink-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-300" required>
@@ -17,7 +17,7 @@
         </div>
 
         <button type="submit"
-            class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl transition-all duration-200 shadow-md w-full">
+            class="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-xl transition-all duration-200 shadow-md w-full">
             Kirim ke WhatsApp
         </button>
     </form>

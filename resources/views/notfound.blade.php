@@ -8,7 +8,6 @@
     @stack('scripts')
     @vite('resources/css/app.css')
 </head>
-
 <body class="bg-pink-50 text-gray-800 h-screen flex items-center justify-center">
     <main class="mt-8 text-center px-6 max-w-2xl">
         <h1 class=" text-3xl font-bold text-pink-600">404   -  Hilang Dalam Kenangan</h1>
@@ -28,13 +27,6 @@
                 Hubungi Kami <span aria-hidden="true">→</span>
             </a>
         </div>
-        <div id="game-container" class="mt-16 flex justify-center">
-            <div id="game" class="relative w-[600px] h-[180px] bg-pink-100 border-2 border-pink-400 rounded-xl overflow-hidden">
-                <div id="love" class="absolute bottom-0 left-10 text-4xl select-none">💌</div>
-                <div id="obstacle" class="absolute bottom-0 left-full text-4xl select-none">👫</div>
-            </div>
-        </div>
-
     </main>
 
 </body>

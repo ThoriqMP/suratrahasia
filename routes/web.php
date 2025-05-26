@@ -19,6 +19,9 @@ Route::get('/kontak', function () {
 Route::get('/tentang', function () {
     return view('tentang');
 });
+Route::get('/anonim', function () {
+    return view('anonim');
+});
 
 Route::fallback(function () {
     return response()->view('notfound', [], 404);
