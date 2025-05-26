@@ -36,7 +36,7 @@
         </form>
 
         <div class="mt-4 text-center">
-            <a href="{{ route('index') }}" class="text-blue-600 hover:underline text-sm">⬅ Kembali ke beranda</a>
+            <a href="\" class="text-blue-600 hover:underline text-sm">⬅ Kembali ke beranda</a>
         </div>
     </div>
 

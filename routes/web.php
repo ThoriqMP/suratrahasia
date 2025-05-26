@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SuratController;
 
 Route::get('/', [SuratController::class, 'index']);
+Route::get('/index', [SuratController::class, 'index']);
 Route::get('/create', [SuratController::class, 'create']);
 Route::post('/surat', [SuratController::class, 'store']);
 Route::get('/surat/{kode}', [SuratController::class, 'show']);
