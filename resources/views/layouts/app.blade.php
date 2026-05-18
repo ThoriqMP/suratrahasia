@@ -125,7 +125,7 @@
         </main>
 
         <!-- Footer -->
-        <footer class="mt-auto border-t border-white/10 bg-slate-950/50 backdrop-blur-md">
+        <footer class="mt-auto border-t border-white/10 bg-slate-950/50 backdrop-blur-md pb-24 sm:pb-8">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div class="text-center text-sm font-medium text-slate-500">
                     <p>&copy; 2024 BucininAja. All rights reserved.</p>
@@ -135,6 +135,42 @@
                 </div>
             </div>
         </footer>
+
+        <!-- Mobile Floating Navigation -->
+        <div class="sm:hidden fixed bottom-6 left-4 right-4 z-50">
+            <nav class="glass-nav px-6 py-3 flex items-center justify-around shadow-[0_0_30px_rgba(244,114,182,0.3)] bg-slate-900/80">
+                <a href="/" class="flex flex-col items-center gap-1 text-slate-300 hover:text-pink-400 transition-colors">
+                    <span class="text-xl">🏠</span>
+                    <span class="text-[10px] font-bold uppercase tracking-wider">Beranda</span>
+                </a>
+                
+                <a href="/create" class="flex flex-col items-center gap-1 -mt-6 relative group">
+                    <div class="w-14 h-14 rounded-full btn-immersive flex items-center justify-center border-4 border-[#020617] shadow-xl group-hover:-translate-y-1 transition-transform">
+                        <span class="text-2xl">✍️</span>
+                    </div>
+                    <span class="text-[10px] font-bold text-pink-400 mt-1 uppercase tracking-wider">Surat</span>
+                </a>
+
+                @auth
+                    @if(auth()->user()->is_admin)
+                        <a href="/admin" class="flex flex-col items-center gap-1 text-slate-300 hover:text-emerald-400 transition-colors">
+                            <span class="text-xl">🛡️</span>
+                            <span class="text-[10px] font-bold uppercase tracking-wider">Admin</span>
+                        </a>
+                    @else
+                        <a href="/dashboard" class="flex flex-col items-center gap-1 text-slate-300 hover:text-purple-400 transition-colors">
+                            <span class="text-xl">👤</span>
+                            <span class="text-[10px] font-bold uppercase tracking-wider">Profil</span>
+                        </a>
+                    @endif
+                @else
+                    <a href="/login" class="flex flex-col items-center gap-1 text-slate-300 hover:text-pink-400 transition-colors">
+                        <span class="text-xl">🔑</span>
+                        <span class="text-[10px] font-bold uppercase tracking-wider">Masuk</span>
+                    </a>
+                @endauth
+            </nav>
+        </div>
     </div>
 </body>
 </html>
