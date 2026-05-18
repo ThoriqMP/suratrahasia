@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 use App\Models\SuratCinta;
 
 class SuratController extends Controller
@@ -17,23 +18,34 @@ class SuratController extends Controller
     }
     
     public function store(Request $request) {
+        $user = Auth::user();
+        if ($user->credits < 1) {
+            return redirect()->route('topup.form')->withErrors(['credits' => 'Kredit kamu tidak cukup. Silakan top-up terlebih dahulu.']);
+        }
+
         $request->validate([
             'dari' => 'required|string|max:255',
             'untuk' => 'required|string|max:255',
             'isi' => 'required|string',
             'password' => 'required|string|min:3',
-            'waktu_hapus' => 'nullable|integer|min:1|max:30'
+            'waktu_hapus' => 'nullable|integer|min:1|max:30',
+            'tema_desain' => 'required|in:classic,neon,vintage'
         ]);
 
         $kode = Str::random(8);
         $surat = new SuratCinta();
         $surat->kode = $kode;
+        $surat->user_id = $user->id;
         $surat->dari = $request->dari;
         $surat->untuk = $request->untuk;
         $surat->isi = $request->isi;
         $surat->password = bcrypt($request->password);
         $surat->waktu_hapus = $request->waktu_hapus ?? null;
+        $surat->tema_desain = $request->tema_desain;
         $surat->save();
+
+        $user->credits -= 1;
+        $user->save();
 
         // Tampilkan view dengan link
         return view('surat.success', ['kode' => $kode]);

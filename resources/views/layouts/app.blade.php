@@ -88,8 +88,25 @@
                 <div class="hidden sm:flex space-x-6 items-center">
                     <a href="/" class="text-sm font-semibold text-slate-300 hover:text-white transition-colors">Beranda</a>
                     <a href="/tentang" class="text-sm font-semibold text-slate-300 hover:text-white transition-colors">Tentang</a>
-                    <a href="/kontak" class="text-sm font-semibold text-slate-300 hover:text-white transition-colors">Kontak</a>
-                    <a href="/create" class="px-5 py-2 text-sm font-bold text-white btn-immersive rounded-xl">Buat Surat</a>
+                    
+                    @auth
+                        @if(auth()->user()->is_admin)
+                            <a href="/admin" class="text-sm font-semibold text-emerald-400 hover:text-emerald-300 transition-colors">Admin Panel</a>
+                        @else
+                            <a href="/dashboard" class="text-sm font-semibold text-pink-400 hover:text-pink-300 transition-colors">Dashboard Ku</a>
+                            <div class="px-3 py-1 rounded-full bg-white/10 border border-white/20 text-xs font-bold text-white flex items-center gap-1">
+                                <span>💎</span> {{ auth()->user()->credits }} Kredit
+                            </div>
+                        @endif
+                        <a href="/create" class="px-5 py-2 text-sm font-bold text-white btn-immersive rounded-xl">Buat Surat</a>
+                        <form method="POST" action="{{ route('logout') }}" class="inline">
+                            @csrf
+                            <button type="submit" class="text-sm font-semibold text-slate-400 hover:text-rose-400 transition-colors">Logout</button>
+                        </form>
+                    @else
+                        <a href="/login" class="text-sm font-semibold text-slate-300 hover:text-white transition-colors">Login</a>
+                        <a href="/register" class="px-5 py-2 text-sm font-bold text-white btn-immersive rounded-xl">Daftar Gratis</a>
+                    @endauth
                 </div>
             </nav>
         </header>

@@ -5,11 +5,33 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SuratController;
 use App\Http\Controllers\AnonRoomController;
 use App\Http\Controllers\AnonMessageController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', [SuratController::class, 'index']);
 Route::get('/index', [SuratController::class, 'index']);
-Route::get('/create', [SuratController::class, 'create']);
-Route::post('/surat', [SuratController::class, 'store']);
+
+// Auth Routes
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// Dashboard & Top-Up Routes
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'userIndex'])->name('dashboard');
+    Route::get('/topup', [DashboardController::class, 'showTopupForm'])->name('topup.form');
+    Route::post('/topup', [DashboardController::class, 'processTopup'])->name('topup.process');
+    
+    Route::get('/admin', [DashboardController::class, 'adminIndex'])->name('admin');
+    Route::post('/admin/approve/{id}', [DashboardController::class, 'approvePayment'])->name('admin.approve');
+
+    // Surat Creation
+    Route::get('/create', [SuratController::class, 'create'])->name('create');
+    Route::post('/surat', [SuratController::class, 'store']);
+});
+
 Route::get('/surat/{kode}', [SuratController::class, 'show']);
 Route::post('/surat/{kode}', [SuratController::class, 'unlock']);
 Route::get('/kontak', function () {

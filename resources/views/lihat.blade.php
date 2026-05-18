@@ -19,12 +19,28 @@
 
         <!-- The Letter Content -->
         <div class="relative group">
-            <div class="absolute inset-0 bg-gradient-to-b from-pink-500/20 to-purple-500/20 rounded-[32px] blur-xl group-hover:blur-2xl transition-all duration-500 opacity-50"></div>
-            <div class="relative bg-white/10 backdrop-blur-2xl p-8 md:p-14 rounded-[32px] border border-white/20 shadow-2xl">
-                <div class="prose prose-invert prose-pink max-w-none text-justify whitespace-pre-wrap text-lg md:text-xl leading-relaxed text-slate-200 font-medium">
-                    {{ $surat->isi }}
+            @if($surat->tema_desain == 'neon')
+                <div class="absolute inset-0 bg-gradient-to-b from-cyan-500/30 to-purple-500/30 rounded-[32px] blur-xl group-hover:blur-2xl transition-all duration-500 opacity-70"></div>
+                <div class="relative bg-slate-900/80 backdrop-blur-2xl p-8 md:p-14 rounded-[32px] border border-cyan-500/30 shadow-[0_0_50px_rgba(6,182,212,0.2)]">
+                    <div class="prose prose-invert max-w-none text-justify whitespace-pre-wrap text-lg md:text-xl leading-relaxed text-cyan-50 font-medium font-mono">
+                        {{ $surat->isi }}
+                    </div>
                 </div>
-            </div>
+            @elseif($surat->tema_desain == 'vintage')
+                <div class="absolute inset-0 bg-gradient-to-b from-amber-500/20 to-orange-500/20 rounded-[32px] blur-xl group-hover:blur-2xl transition-all duration-500 opacity-50"></div>
+                <div class="relative bg-[#fdf6e3] backdrop-blur-2xl p-8 md:p-14 rounded-[32px] border border-amber-900/20 shadow-2xl">
+                    <div class="prose max-w-none text-justify whitespace-pre-wrap text-lg md:text-xl leading-relaxed text-amber-900 font-serif">
+                        {{ $surat->isi }}
+                    </div>
+                </div>
+            @else
+                <div class="absolute inset-0 bg-gradient-to-b from-pink-500/20 to-purple-500/20 rounded-[32px] blur-xl group-hover:blur-2xl transition-all duration-500 opacity-50"></div>
+                <div class="relative bg-white/10 backdrop-blur-2xl p-8 md:p-14 rounded-[32px] border border-white/20 shadow-2xl">
+                    <div class="prose prose-invert prose-pink max-w-none text-justify whitespace-pre-wrap text-lg md:text-xl leading-relaxed text-slate-200 font-medium">
+                        {{ $surat->isi }}
+                    </div>
+                </div>
+            @endif
         </div>
 
         <!-- Letter Footer -->
