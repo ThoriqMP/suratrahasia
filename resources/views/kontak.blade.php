@@ -1,24 +1,30 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-xl mx-auto py-12 px-6 text-center">
-    <h2 class="text-3xl font-bold text-pink-600 mb-4">📬 Kirim Pesan ke WhatsApp</h2>
-    <p class="text-gray-600 mb-6">Kami menerima kritik dan saran terhadap website ini.</p>
+<div class="max-w-2xl mx-auto py-12 px-4">
+    <div class="text-center mb-10">
+        <div class="inline-block p-4 rounded-full bg-purple-500/10 border border-purple-500/20 mb-6 shadow-[0_0_30px_rgba(168,85,247,0.2)]">
+            <span class="text-4xl filter drop-shadow-lg">📬</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-black text-white tracking-tight mb-2">Kirim Pesan</h2>
+        <p class="text-slate-400 text-lg">Kami menerima kritik dan saran terhadap website ini.</p>
+    </div>
 
-    <form id="whatsappForm" onsubmit="return sendToWhatsApp()" class="bg-pink-50  rounded-xl p-6 shadow-sm">
-        <div class="mb-4 text-left">
-            <label class="block text-sm text-pink-700 font-semibold mb-2">Nama Kamu</label>
-            <input type="text" id="nama" class="w-full px-4 py-3 border border-pink-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-300" required>
+    <form id="whatsappForm" onsubmit="return sendToWhatsApp()" class="glass-card p-8 md:p-12 space-y-6">
+        
+        <div class="group">
+            <label class="block text-sm font-bold text-slate-300 mb-2 group-focus-within:text-pink-400 transition-colors uppercase tracking-widest">Nama Kamu</label>
+            <input type="text" id="nama" class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 focus:bg-white/10 text-white placeholder-slate-500 transition-all duration-300 outline-none" placeholder="Masukkan nama..." required>
         </div>
 
-        <div class="mb-4 text-left">
-            <label class="block text-sm text-pink-700 font-semibold mb-2">Pesan</label>
-            <textarea id="pesan" rows="5" class="w-full px-4 py-3 border border-pink-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-300 resize-y" required></textarea>
+        <div class="group">
+            <label class="block text-sm font-bold text-slate-300 mb-2 group-focus-within:text-pink-400 transition-colors uppercase tracking-widest">Pesan</label>
+            <textarea id="pesan" rows="5" class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:border-pink-500 focus:ring-2 focus:ring-pink-500/20 focus:bg-white/10 text-white placeholder-slate-500 transition-all duration-300 outline-none resize-y" placeholder="Sampaikan kritik atau saranmu..." required></textarea>
         </div>
 
         <button type="submit"
-            class="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-xl transition-all duration-200 shadow-md w-full">
-            Kirim ke WhatsApp
+            class="w-full btn-immersive text-white font-black text-lg py-5 px-6 rounded-2xl mt-8 flex items-center justify-center gap-2 shadow-xl">
+            <span>💬</span> Kirim via WhatsApp
         </button>
     </form>
 </div>

@@ -2,62 +2,65 @@
 
 @section('content')
 <div class="max-w-2xl mx-auto">
-    <h2 class="text-3xl font-bold text-pink-600 text-center">
-        ✍️ Tulis Surat Cinta Romantis
-        <div class="mt-2 text-lg font-normal text-pink-400">Ungkapkan Perasaanmu Disini</div>
-    </h2>
+    <div class="text-center mb-10">
+        <div class="inline-block p-4 rounded-full bg-pink-500/20 border border-pink-500/30 mb-4 animate-pulse">
+            <span class="text-3xl">✍️</span>
+        </div>
+        <h2 class="text-3xl md:text-4xl font-black text-white tracking-tight mb-2">
+            Tulis Surat Cinta
+        </h2>
+        <p class="text-lg font-medium text-pink-400">Ungkapkan perasaanmu, buat dia tersenyum.</p>
+    </div>
 
-    <form action="/surat" method="POST" class="space-y-6 bg-white rounded-xl p-6 mt-6 shadow-md">
+    <form action="/surat" method="POST" class="space-y-6">
         @csrf
         
-        <div class="space-y-5">
-            <div>
-                <label class="block text-sm font-medium text-pink-700 mb-2">👤 Dari</label>
+        <div class="space-y-6">
+            <div class="group">
+                <label class="block text-sm font-bold text-slate-300 mb-2 group-focus-within:text-pink-400 transition-colors uppercase tracking-widest">👤 Dari</label>
                 <input type="text" name="dari" placeholder="Nama kamu" 
-                    class="w-full px-4 py-3 border-2 border-pink-100 rounded-xl focus:border-pink-400 
-                           focus:ring-2 focus:ring-pink-200 transition-all duration-200"
+                    class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:border-pink-500 
+                           focus:ring-2 focus:ring-pink-500/20 focus:bg-white/10 text-white placeholder-slate-500 transition-all duration-300 outline-none"
                     required>
             </div>
 
-            <div>
-                <label class="block text-sm font-medium text-pink-700 mb-2">💖 Untuk</label>
-                <input type="text" name="untuk" placeholder="Nama pasanganmu" 
-                    class="w-full px-4 py-3 border-2 border-pink-100 rounded-xl focus:border-pink-400 
-                           focus:ring-2 focus:ring-pink-200 transition-all duration-200"
+            <div class="group">
+                <label class="block text-sm font-bold text-slate-300 mb-2 group-focus-within:text-pink-400 transition-colors uppercase tracking-widest">💖 Untuk</label>
+                <input type="text" name="untuk" placeholder="Nama si dia" 
+                    class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:border-pink-500 
+                           focus:ring-2 focus:ring-pink-500/20 focus:bg-white/10 text-white placeholder-slate-500 transition-all duration-300 outline-none"
                     required>
             </div>
 
-            <div>
-                <label class="block text-sm font-medium text-pink-700 mb-2">💌 Isi Surat</label>
-                <textarea name="isi" rows="6" placeholder="Tuliskan isi hati kamu..." 
-                    class="w-full px-4 py-3 border-2 border-pink-100 rounded-xl focus:border-pink-400 
-                           focus:ring-2 focus:ring-pink-200 resize-y min-h-[150px] transition-all duration-200"
+            <div class="group">
+                <label class="block text-sm font-bold text-slate-300 mb-2 group-focus-within:text-pink-400 transition-colors uppercase tracking-widest">💌 Isi Surat</label>
+                <textarea name="isi" rows="6" placeholder="Tuliskan isi hati kamu sejujur-jujurnya..." 
+                    class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:border-pink-500 
+                           focus:ring-2 focus:ring-pink-500/20 focus:bg-white/10 text-white placeholder-slate-500 resize-y min-h-[150px] transition-all duration-300 outline-none"
                     required></textarea>
             </div>
 
-            <div>
-                <label class="block text-sm font-medium text-pink-700 mb-2">🔑 Password</label>
-                <input type="password" name="password" placeholder="Buat password unik" 
-                    class="w-full px-4 py-3 border-2 border-pink-100 rounded-xl focus:border-pink-400 
-                           focus:ring-2 focus:ring-pink-200 transition-all duration-200"
+            <div class="group">
+                <label class="block text-sm font-bold text-slate-300 mb-2 group-focus-within:text-pink-400 transition-colors uppercase tracking-widest">🔑 Password Rahasia</label>
+                <input type="password" name="password" placeholder="Buat password untuk membuka surat ini" 
+                    class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:border-pink-500 
+                           focus:ring-2 focus:ring-pink-500/20 focus:bg-white/10 text-white placeholder-slate-500 transition-all duration-300 outline-none"
                     required>
-                <p class="mt-2 text-xs text-gray-500">Password ini akan digunakan untuk membuka surat</p>
+                <p class="mt-2 text-xs text-slate-500">Beritahu dia password ini saat kamu membagikan linknya nanti.</p>
             </div>
 
-            <div>
-                <label class="block text-sm font-medium text-pink-700 mb-2">⏳ Hapus otomatis dalam berapa hari?</label>
+            <div class="group">
+                <label class="block text-sm font-bold text-slate-300 mb-2 group-focus-within:text-pink-400 transition-colors uppercase tracking-widest">⏳ Waktu Kedaluwarsa (Hari)</label>
                 <input type="number" name="waktu_hapus" min="1" max="30" placeholder="Misal: 7 (opsional)" 
-                    class="w-full px-4 py-3 border-2 border-pink-100 rounded-xl focus:border-pink-400 
-                           focus:ring-2 focus:ring-pink-200 transition-all duration-200">
-                <p class="mt-2 text-xs text-gray-500">Kosongkan jika ingin pakai default: 7 hari setelah dibuka / 3 hari jika tidak dibuka</p>
+                    class="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl focus:border-pink-500 
+                           focus:ring-2 focus:ring-pink-500/20 focus:bg-white/10 text-white placeholder-slate-500 transition-all duration-300 outline-none">
+                <p class="mt-2 text-xs text-slate-500">Berapa lama surat ini bertahan? (Default: 7 hari setelah dibuka).</p>
             </div>
         </div>
 
         <button type="submit" 
-            class="w-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 
-                   text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 
-                   transform hover:scale-[1.02] shadow-lg hover:shadow-xl">
-            🕊️ Kirim Surat Cinta
+            class="w-full btn-immersive text-white font-black text-lg py-5 px-6 rounded-2xl mt-8 flex items-center justify-center gap-2">
+            <span>🚀</span> Kirimkan Perasaan Ini
         </button>
     </form>
 </div>
