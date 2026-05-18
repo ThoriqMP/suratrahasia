@@ -69,4 +69,33 @@
         </div>
     </div>
 </div>
+
+<!-- Pricing Section -->
+<div class="mt-20 pt-16 border-t border-white/10 pb-10">
+    <div class="text-center mb-16">
+        <h2 class="text-3xl font-black text-white mb-4">Paket Kredit Premium</h2>
+        <p class="text-slate-400 max-w-xl mx-auto">Satu kredit berarti satu surat dengan pilihan desain tak terbatas. Dapatkan 1 kredit gratis saat mendaftar!</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
+        @foreach($packages as $paket)
+        <div class="glass-card p-6 text-center border {{ $paket->is_popular ? 'border-pink-500 shadow-[0_0_30px_rgba(244,114,182,0.2)] relative overflow-hidden' : 'border-white/10 hover:border-pink-500/50 hover:shadow-[0_0_30px_rgba(244,114,182,0.2)]' }} hover:-translate-y-2 transition-all group">
+            @if($paket->is_popular)
+                <div class="absolute top-0 right-0 bg-gradient-to-r from-pink-500 to-purple-500 text-[10px] font-bold text-white px-8 py-1 rotate-45 translate-x-[25px] translate-y-[10px] shadow-md">POPULER</div>
+            @endif
+            
+            <span class="text-4xl block mb-4 group-hover:scale-110 transition-transform">
+                @if($paket->jumlah_kredit <= 1) 💌
+                @elseif($paket->jumlah_kredit <= 5) 💐
+                @elseif($paket->is_popular) 🎁
+                @else 👑
+                @endif
+            </span>
+            <h3 class="text-xl font-bold text-white mb-1">{{ $paket->nama_paket }}</h3>
+            <p class="text-pink-400 font-black text-2xl mb-4">Rp {{ number_format($paket->harga, 0, ',', '.') }}</p>
+            <a href="/login" class="block w-full py-2 rounded-xl {{ $paket->is_popular ? 'btn-immersive shadow-lg' : 'bg-white/10 hover:bg-white/20' }} text-white font-bold transition-all">Beli Sekarang</a>
+        </div>
+        @endforeach
+    </div>
+</div>
 @endsection

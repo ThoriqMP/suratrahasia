@@ -77,6 +77,7 @@
 
     <div class="min-h-screen flex flex-col relative z-10">
         <!-- Header -->
+        @if(!(request()->is('/') && !auth()->check()))
         <header class="py-6 px-4 sm:px-6 lg:px-8">
             <nav class="max-w-5xl mx-auto glass-nav px-6 py-4 flex items-center justify-between shadow-2xl transition-all">
                 <a href="/" class="flex items-center gap-3 group">
@@ -110,6 +111,7 @@
                 </div>
             </nav>
         </header>
+        @endif
 
         <!-- Main Content -->
         <main class="flex-1 flex flex-col justify-center py-10">
@@ -136,6 +138,7 @@
             </div>
         </footer>
 
+        @if(!(request()->is('/') && !auth()->check()))
         <!-- Mobile Floating Navigation -->
         <div class="sm:hidden fixed bottom-6 left-4 right-4 z-50">
             <nav class="glass-nav px-6 py-3 flex items-center justify-around shadow-[0_0_30px_rgba(244,114,182,0.3)] bg-slate-900/80">
@@ -171,6 +174,7 @@
                 @endauth
             </nav>
         </div>
+        @endif
     </div>
 </body>
 </html>

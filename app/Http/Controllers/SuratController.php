@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Models\SuratCinta;
+use App\Models\CreditPackage;
 
 class SuratController extends Controller
 {
@@ -14,7 +15,8 @@ class SuratController extends Controller
         return view('form');
     }
     public function index() {
-        return view('beranda');
+        $packages = CreditPackage::orderBy('jumlah_kredit')->get();
+        return view('beranda', compact('packages'));
     }
     
     public function store(Request $request) {

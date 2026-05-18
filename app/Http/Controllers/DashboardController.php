@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use App\Models\SuratCinta;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Models\CreditPackage;
 
 class DashboardController extends Controller
 {
@@ -33,30 +34,26 @@ class DashboardController extends Controller
 
         $pendingTransactions = Transaction::with('user')->where('status', 'pending')->orderBy('created_at', 'desc')->get();
         $recentSurats = SuratCinta::orderBy('created_at', 'desc')->take(10)->get();
+        $packages = CreditPackage::orderBy('jumlah_kredit')->get();
 
-        return view('dashboard.admin', compact('user', 'pendingTransactions', 'recentSurats'));
+        return view('dashboard.admin', compact('user', 'pendingTransactions', 'recentSurats', 'packages'));
     }
 
     public function showTopupForm()
     {
-        return view('dashboard.topup');
+        $packages = CreditPackage::orderBy('jumlah_kredit')->get();
+        return view('dashboard.topup', compact('packages'));
     }
 
     public function processTopup(Request $request)
     {
         $request->validate([
-            'paket' => 'required|in:1,5,15,35'
+            'paket' => 'required|exists:credit_packages,id'
         ]);
 
-        $harga = [
-            '1' => 1000,
-            '5' => 5000,
-            '15' => 10000,
-            '35' => 20000,
-        ];
-
-        $jumlahKredit = $request->paket;
-        $totalHarga = $harga[$jumlahKredit];
+        $package = CreditPackage::findOrFail($request->paket);
+        $jumlahKredit = $package->jumlah_kredit;
+        $totalHarga = $package->harga;
 
         $transaction = Transaction::create([
             'user_id' => Auth::id(),
@@ -94,5 +91,22 @@ class DashboardController extends Controller
         $user->save();
 
         return back()->with('success', 'Pembayaran berhasil disetujui. Kredit telah ditambahkan.');
+    }
+
+    public function updatePackage(Request $request, $id)
+    {
+        if (!Auth::user()->is_admin) {
+            return abort(403);
+        }
+
+        $package = CreditPackage::findOrFail($id);
+        $package->update([
+            'nama_paket' => $request->nama_paket,
+            'jumlah_kredit' => $request->jumlah_kredit,
+            'harga' => $request->harga,
+            'is_popular' => $request->has('is_popular')
+        ]);
+
+        return back()->with('success', 'Paket kredit berhasil diperbarui.');
     }
 }

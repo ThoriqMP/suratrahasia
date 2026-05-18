@@ -20,52 +20,26 @@
         @csrf
         
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <!-- Paket 1 -->
+            @foreach($packages as $paket)
             <label class="cursor-pointer relative">
-                <input type="radio" name="paket" value="1" class="peer sr-only" required>
-                <div class="glass-card p-6 text-center border-2 border-transparent peer-checked:border-pink-500 peer-checked:bg-pink-500/10 transition-all group">
-                    <span class="text-3xl block mb-2">💌</span>
-                    <h3 class="text-xl font-bold text-white mb-1">1 Kredit</h3>
-                    <p class="text-pink-400 font-black text-lg">Rp 1.000</p>
+                <input type="radio" name="paket" value="{{ $paket->id }}" class="peer sr-only" required>
+                <div class="glass-card p-6 text-center border-2 border-transparent peer-checked:border-pink-500 peer-checked:bg-pink-500/10 transition-all group {{ $paket->is_popular ? 'relative overflow-hidden' : '' }}">
+                    @if($paket->is_popular)
+                        <div class="absolute top-0 right-0 bg-gradient-to-r from-pink-500 to-purple-500 text-[10px] font-bold text-white px-8 py-1 rotate-45 translate-x-[25px] translate-y-[10px]">POPULER</div>
+                    @endif
+                    <span class="text-3xl block mb-2">
+                        @if($paket->jumlah_kredit <= 1) 💌
+                        @elseif($paket->jumlah_kredit <= 5) 💐
+                        @elseif($paket->is_popular) 🎁
+                        @else 👑
+                        @endif
+                    </span>
+                    <h3 class="text-xl font-bold text-white mb-1">{{ $paket->nama_paket }}</h3>
+                    <p class="text-pink-400 font-black text-lg">Rp {{ number_format($paket->harga, 0, ',', '.') }}</p>
                 </div>
                 <div class="absolute top-2 right-2 w-5 h-5 rounded-full border-2 border-white/20 peer-checked:border-pink-500 peer-checked:bg-pink-500 flex items-center justify-center transition-all"></div>
             </label>
-
-            <!-- Paket 2 -->
-            <label class="cursor-pointer relative">
-                <input type="radio" name="paket" value="5" class="peer sr-only" required>
-                <div class="glass-card p-6 text-center border-2 border-transparent peer-checked:border-pink-500 peer-checked:bg-pink-500/10 transition-all group">
-                    <span class="text-3xl block mb-2">💐</span>
-                    <h3 class="text-xl font-bold text-white mb-1">5 Kredit</h3>
-                    <p class="text-pink-400 font-black text-lg">Rp 5.000</p>
-                </div>
-                <div class="absolute top-2 right-2 w-5 h-5 rounded-full border-2 border-white/20 peer-checked:border-pink-500 peer-checked:bg-pink-500 flex items-center justify-center transition-all"></div>
-            </label>
-
-            <!-- Paket 3 -->
-            <label class="cursor-pointer relative">
-                <input type="radio" name="paket" value="15" class="peer sr-only" required>
-                <div class="glass-card p-6 text-center border-2 border-transparent peer-checked:border-pink-500 peer-checked:bg-pink-500/10 transition-all group relative overflow-hidden">
-                    <div class="absolute top-0 right-0 bg-gradient-to-r from-pink-500 to-purple-500 text-[10px] font-bold text-white px-8 py-1 rotate-45 translate-x-[25px] translate-y-[10px]">POPULER</div>
-                    <span class="text-3xl block mb-2">🎁</span>
-                    <h3 class="text-xl font-bold text-white mb-1">15 Kredit</h3>
-                    <p class="text-pink-400 font-black text-lg">Rp 10.000</p>
-                    <p class="text-xs text-slate-400 line-through">Rp 15.000</p>
-                </div>
-                <div class="absolute top-2 right-2 w-5 h-5 rounded-full border-2 border-white/20 peer-checked:border-pink-500 peer-checked:bg-pink-500 flex items-center justify-center transition-all"></div>
-            </label>
-
-            <!-- Paket 4 -->
-            <label class="cursor-pointer relative">
-                <input type="radio" name="paket" value="35" class="peer sr-only" required>
-                <div class="glass-card p-6 text-center border-2 border-transparent peer-checked:border-pink-500 peer-checked:bg-pink-500/10 transition-all group">
-                    <span class="text-3xl block mb-2">👑</span>
-                    <h3 class="text-xl font-bold text-white mb-1">35 Kredit</h3>
-                    <p class="text-pink-400 font-black text-lg">Rp 20.000</p>
-                    <p class="text-xs text-slate-400 line-through">Rp 35.000</p>
-                </div>
-                <div class="absolute top-2 right-2 w-5 h-5 rounded-full border-2 border-white/20 peer-checked:border-pink-500 peer-checked:bg-pink-500 flex items-center justify-center transition-all"></div>
-            </label>
+            @endforeach
         </div>
 
         <div class="glass-card p-6 text-slate-300 text-sm">
