@@ -8,7 +8,7 @@ class SuratCinta extends Model
 {
     protected $table = 'surat_cinta'; // <- tambahkan ini!
     protected $fillable = [
-    'kode', 'dari', 'untuk', 'isi', 'password', 'waktu_hapus', 'dibuka_pada'
+    'kode', 'dari', 'untuk', 'isi', 'password', 'waktu_hapus', 'dibuka_pada', 'user_id', 'tema_desain'
     ];
 
     protected $dates = ['dibuka_pada'];

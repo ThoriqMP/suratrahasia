@@ -30,7 +30,6 @@ class SuratController extends Controller
             'untuk' => 'required|string|max:255',
             'isi' => 'required|string',
             'password' => 'required|string|min:3',
-            'waktu_hapus' => 'nullable|integer|min:1|max:30',
             'tema_desain' => 'required|in:classic,neon,vintage'
         ]);
 
@@ -42,7 +41,7 @@ class SuratController extends Controller
         $surat->untuk = $request->untuk;
         $surat->isi = $request->isi;
         $surat->password = bcrypt($request->password);
-        $surat->waktu_hapus = $request->waktu_hapus ?? null;
+        $surat->waktu_hapus = null;
         $surat->tema_desain = $request->tema_desain;
         $surat->save();
 
@@ -68,12 +67,6 @@ class SuratController extends Controller
         if (Hash::check($request->password, $surat->password)) {
             if (is_null($surat->dibuka_pada)) {
                 $surat->dibuka_pada = now();
-
-                // Jika user tidak menentukan waktu hapus, pakai default 7 hari dari dibuka
-                if (is_null($surat->waktu_hapus)) {
-                    $surat->waktu_hapus = 7;
-                }
-
                 $surat->save();
             }
 
@@ -124,5 +117,15 @@ class SuratController extends Controller
         ]);
     }
 
+    public function updatePassword(Request $request, $id) {
+        $request->validate([
+            'password' => 'required|string|min:3'
+        ]);
 
+        $surat = SuratCinta::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+        $surat->password = bcrypt($request->password);
+        $surat->save();
+
+        return back()->with('success', 'Password surat berhasil diperbarui!');
+    }
 }

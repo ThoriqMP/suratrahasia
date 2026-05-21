@@ -1,7 +1,25 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-4xl mx-auto py-8 animate-fade-in-up">
+<div x-data="{ 
+    editOpen: false, 
+    editSuratId: null, 
+    editSuratUntuk: '', 
+    editAction: '',
+    openEdit(id, untuk, actionUrl) {
+        this.editSuratId = id;
+        this.editSuratUntuk = untuk;
+        this.editAction = actionUrl;
+        this.editOpen = true;
+    }
+}" class="max-w-4xl mx-auto py-8 animate-fade-in-up">
+
+    @if(session('success'))
+        <div class="mb-6 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold">
+            ✅ {{ session('success') }}
+        </div>
+    @endif
+
     <!-- Header -->
     <div class="glass-card p-8 mb-8 flex flex-col md:flex-row items-center justify-between gap-6">
         <div class="flex items-center gap-6">
@@ -19,9 +37,17 @@
             <div class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400">
                 {{ $user->credits }} 💎
             </div>
-            <a href="{{ route('topup.form') }}" class="mt-3 inline-block bg-white/10 hover:bg-white/20 text-white text-sm font-bold py-2 px-4 rounded-xl border border-white/20 transition-all">
-                + Top Up Kredit
-            </a>
+            <div class="mt-3 flex flex-wrap justify-center md:justify-end gap-2">
+                <a href="{{ route('topup.form') }}" class="inline-block bg-white/10 hover:bg-white/20 text-white text-sm font-bold py-2 px-4 rounded-xl border border-white/20 transition-all">
+                    + Top Up Kredit
+                </a>
+                <form method="POST" action="{{ route('logout') }}" class="inline">
+                    @csrf
+                    <button type="submit" class="bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-sm font-bold py-2 px-4 rounded-xl border border-rose-500/30 transition-all flex items-center gap-1">
+                        <span>🚪</span> Keluar
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -51,7 +77,11 @@
                         
                         <div class="flex items-center justify-between border-t border-white/10 pt-4">
                             <span class="text-xs text-slate-500">{{ $surat->created_at->diffForHumans() }}</span>
-                            <div class="flex gap-2">
+                            <div class="flex gap-3">
+                                <button @click="openEdit({{ $surat->id }}, '{{ addslashes($surat->untuk) }}', '{{ route('surat.update-password', $surat->id) }}')" 
+                                        class="text-xs font-bold text-purple-400 hover:text-purple-300 flex items-center gap-1 transition-all">
+                                    <span>🔑</span> Edit Sandi
+                                </button>
                                 <a href="/surat/{{ $surat->kode }}" target="_blank" class="text-xs font-bold text-pink-400 hover:text-pink-300">Lihat Surat ↗</a>
                             </div>
                         </div>
@@ -60,6 +90,42 @@
             @endforeach
         </div>
     @endif
+    <!-- Edit Password Modal -->
+    <div x-show="editOpen" 
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-95"
+         x-cloak>
+        <div class="glass-card w-full max-w-md p-8 border border-white/20 shadow-2xl relative" @click.away="editOpen = false">
+            <button @click="editOpen = false" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl">&times;</button>
+            <h3 class="text-xl font-bold text-white mb-2 flex items-center gap-2"><span>🔑</span> Edit Password Surat</h3>
+            <p class="text-xs text-slate-400 mb-6">Ubah password untuk surat yang ditujukan kepada <span class="text-pink-400 font-bold" x-text="editSuratUntuk"></span>.</p>
+            
+            <form :action="editAction" method="POST" class="space-y-4">
+                @csrf
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-widest mb-2">Password Baru</label>
+                    <input type="password" name="password" placeholder="Masukkan password baru" required minlength="3"
+                           class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:border-pink-500 focus:ring-1 focus:ring-pink-500/20 text-white text-sm outline-none transition-all">
+                </div>
+                
+                <div class="flex gap-3 pt-4">
+                    <button type="button" @click="editOpen = false"
+                            class="flex-1 py-3 bg-white/5 hover:bg-white/10 text-white text-sm font-bold rounded-xl border border-white/10 transition-all">
+                        Batal
+                    </button>
+                    <button type="submit"
+                            class="flex-1 py-3 btn-immersive text-white text-sm font-bold rounded-xl transition-all">
+                        Simpan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 <style>
@@ -69,4 +135,10 @@
         to { opacity: 1; transform: translateY(0); }
     }
 </style>
+
+@once
+@push('scripts')
+<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+@endpush
+@endonce
 @endsection

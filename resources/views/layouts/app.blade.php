@@ -166,6 +166,15 @@
                             <span class="text-[10px] font-bold uppercase tracking-wider">Profil</span>
                         </a>
                     @endif
+                    
+                    <form method="POST" action="{{ route('logout') }}" id="logout-form-mobile" class="hidden">
+                        @csrf
+                    </form>
+                    <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form-mobile').submit();" 
+                       class="flex flex-col items-center gap-1 text-slate-300 hover:text-rose-400 transition-colors">
+                        <span class="text-xl">🚪</span>
+                        <span class="text-[10px] font-bold uppercase tracking-wider">Keluar</span>
+                    </a>
                 @else
                     <a href="/login" class="flex flex-col items-center gap-1 text-slate-300 hover:text-pink-400 transition-colors">
                         <span class="text-xl">🔑</span>

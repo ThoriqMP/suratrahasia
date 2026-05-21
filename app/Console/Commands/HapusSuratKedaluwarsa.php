@@ -13,19 +13,7 @@ class HapusSuratKedaluwarsa extends Command
 
     public function handle()
     {
-        $now = Carbon::now();
-
-        // Hapus surat yang SUDAH DIBUKA dan melebihi waktu hapus
-        $hapusDibuka = SuratCinta::whereNotNull('dibuka_pada')
-            ->whereRaw("DATE_ADD(dibuka_pada, INTERVAL waktu_hapus DAY) <= ?", [$now])
-            ->delete();
-
-        // Hapus surat yang BELUM DIBUKA dan lebih dari 3 hari tidak dibuka
-        $hapusBelumDibuka = SuratCinta::whereNull('dibuka_pada')
-            ->where('created_at', '<=', $now->subDays(3))
-            ->delete();
-
-        $this->info("Surat dibuka dihapus: $hapusDibuka");
-        $this->info("Surat tidak dibuka dihapus: $hapusBelumDibuka");
+        $this->info("Sistem hapus otomatis dinonaktifkan. Surat disimpan selamanya.");
+        return 0;
     }
 }

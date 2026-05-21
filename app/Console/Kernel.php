@@ -13,7 +13,7 @@ class Kernel extends ConsoleKernel
 
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('surat:hapus-kedaluwarsa')->daily();
+        // Sistem hapus otomatis dinonaktifkan
     }
 
 

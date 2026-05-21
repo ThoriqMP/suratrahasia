@@ -53,7 +53,7 @@
             </div>
             <h3 class="text-xl font-bold text-white mb-3">2. Amankan Pesan</h3>
             <p class="text-slate-400 leading-relaxed text-sm">
-                Pasang password khusus agar hanya dia yang bisa membuka. Atur juga waktu kedaluwarsa otomatis suratmu.
+                Pasang password khusus agar hanya dia yang bisa membuka. Surat dijamin aman, rahasia, dan tersimpan selamanya.
             </p>
         </div>
 

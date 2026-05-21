@@ -31,6 +31,7 @@ Route::middleware('auth')->group(function () {
     // Surat Creation
     Route::get('/create', [SuratController::class, 'create'])->name('create');
     Route::post('/surat', [SuratController::class, 'store']);
+    Route::post('/surat/{id}/update-password', [SuratController::class, 'updatePassword'])->name('surat.update-password');
 });
 
 Route::get('/surat/{kode}', [SuratController::class, 'show']);
