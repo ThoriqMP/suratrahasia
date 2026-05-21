@@ -27,6 +27,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin', [DashboardController::class, 'adminIndex'])->name('admin');
     Route::post('/admin/approve/{id}', [DashboardController::class, 'approvePayment'])->name('admin.approve');
     Route::post('/admin/package/{id}', [DashboardController::class, 'updatePackage'])->name('admin.package.update');
+    Route::post('/admin/user/{id}/credits', [DashboardController::class, 'updateUserCredits'])->name('admin.user.credits');
 
     // Surat Creation
     Route::get('/create', [SuratController::class, 'create'])->name('create');

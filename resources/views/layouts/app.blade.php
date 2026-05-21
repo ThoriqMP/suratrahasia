@@ -99,7 +99,9 @@
                                 <span>💎</span> {{ auth()->user()->credits }} Kredit
                             </div>
                         @endif
+                        @if(!auth()->user()->is_admin)
                         <a href="/create" class="px-5 py-2 text-sm font-bold text-white btn-immersive rounded-xl">Buat Surat</a>
+                        @endif
                         <form method="POST" action="{{ route('logout') }}" class="inline">
                             @csrf
                             <button type="submit" class="text-sm font-semibold text-slate-400 hover:text-rose-400 transition-colors">Logout</button>
@@ -140,20 +142,22 @@
 
         @if(!(request()->is('/') && !auth()->check()))
         <!-- Mobile Floating Navigation -->
-        <div class="sm:hidden fixed bottom-6 left-4 right-4 z-50">
+        <div id="mobile-nav" class="sm:hidden fixed bottom-6 left-4 right-4 z-50 transition-all duration-300">
             <nav class="glass-nav px-6 py-3 flex items-center justify-around shadow-[0_0_30px_rgba(244,114,182,0.3)] bg-slate-900/80">
                 <a href="/" class="flex flex-col items-center gap-1 text-slate-300 hover:text-pink-400 transition-colors">
                     <span class="text-xl">🏠</span>
                     <span class="text-[10px] font-bold uppercase tracking-wider">Beranda</span>
                 </a>
                 
+                @if(!auth()->check() || !auth()->user()->is_admin)
                 <a href="/create" class="flex flex-col items-center gap-1 -mt-6 relative group">
                     <div class="w-14 h-14 rounded-full btn-immersive flex items-center justify-center border-4 border-[#020617] shadow-xl group-hover:-translate-y-1 transition-transform">
                         <span class="text-2xl">✍️</span>
                     </div>
                     <span class="text-[10px] font-bold text-pink-400 mt-1 uppercase tracking-wider">Surat</span>
                 </a>
-
+                @endif
+                
                 @auth
                     @if(auth()->user()->is_admin)
                         <a href="/admin" class="flex flex-col items-center gap-1 text-slate-300 hover:text-emerald-400 transition-colors">
@@ -185,5 +189,27 @@
         </div>
         @endif
     </div>
+
+    <!-- Script to Auto-Hide Mobile Nav When Typing -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileNav = document.getElementById('mobile-nav');
+            if (!mobileNav) return;
+
+            document.addEventListener('focusin', function(e) {
+                const target = e.target;
+                if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+                    mobileNav.classList.add('hidden');
+                }
+            }, true);
+
+            document.addEventListener('focusout', function(e) {
+                const target = e.target;
+                if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+                    mobileNav.classList.remove('hidden');
+                }
+            }, true);
+        });
+    </script>
 </body>
 </html>

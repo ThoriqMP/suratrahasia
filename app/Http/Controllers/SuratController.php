@@ -12,14 +12,23 @@ use App\Models\CreditPackage;
 class SuratController extends Controller
 {
     public function create() {
+        if (Auth::check() && Auth::user()->is_admin) {
+            return redirect('/admin');
+        }
         return view('form');
     }
     public function index() {
+        if (Auth::check() && Auth::user()->is_admin) {
+            return redirect('/admin');
+        }
         $packages = CreditPackage::orderBy('jumlah_kredit')->get();
         return view('beranda', compact('packages'));
     }
     
     public function store(Request $request) {
+        if (Auth::check() && Auth::user()->is_admin) {
+            return redirect('/admin');
+        }
         $user = Auth::user();
         if ($user->credits < 1) {
             return redirect()->route('topup.form')->withErrors(['credits' => 'Kredit kamu tidak cukup. Silakan top-up terlebih dahulu.']);

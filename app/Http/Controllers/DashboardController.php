@@ -33,20 +33,38 @@ class DashboardController extends Controller
         }
 
         $pendingTransactions = Transaction::with('user')->where('status', 'pending')->orderBy('created_at', 'desc')->get();
-        $recentSurats = SuratCinta::orderBy('created_at', 'desc')->take(10)->get();
         $packages = CreditPackage::orderBy('jumlah_kredit')->get();
+        
+        // Active users directory with letter count
+        $users = User::withCount('surats')->orderBy('created_at', 'desc')->get();
 
-        return view('dashboard.admin', compact('user', 'pendingTransactions', 'recentSurats', 'packages'));
+        // System usage reports
+        $stats = [
+            'total_users' => User::where('is_admin', false)->count(),
+            'total_surat' => SuratCinta::count(),
+            'total_dibuka' => SuratCinta::whereNotNull('dibuka_pada')->count(),
+            'total_transaksi' => Transaction::count(),
+            'total_pendapatan' => Transaction::where('status', 'approved')->sum('total_harga'),
+            'total_kredit' => User::where('is_admin', false)->sum('credits') ?: 0,
+        ];
+
+        return view('dashboard.admin', compact('user', 'pendingTransactions', 'packages', 'users', 'stats'));
     }
 
     public function showTopupForm()
     {
+        if (Auth::user()->is_admin) {
+            return redirect('/admin');
+        }
         $packages = CreditPackage::orderBy('jumlah_kredit')->get();
         return view('dashboard.topup', compact('packages'));
     }
 
     public function processTopup(Request $request)
     {
+        if (Auth::user()->is_admin) {
+            return redirect('/admin');
+        }
         $request->validate([
             'paket' => 'required|exists:credit_packages,id'
         ]);
@@ -108,5 +126,23 @@ class DashboardController extends Controller
         ]);
 
         return back()->with('success', 'Paket kredit berhasil diperbarui.');
+    }
+
+    public function updateUserCredits(Request $request, $id)
+    {
+        if (!Auth::user()->is_admin) {
+            return abort(403);
+        }
+
+        $request->validate([
+            'credits' => 'required|integer|min:0'
+        ]);
+
+        $targetUser = User::findOrFail($id);
+        $oldCredits = $targetUser->credits;
+        $targetUser->credits = $request->credits;
+        $targetUser->save();
+
+        return back()->with('success', "Kredit untuk user {$targetUser->name} berhasil diperbarui dari {$oldCredits} menjadi {$request->credits}.");
     }
 }
