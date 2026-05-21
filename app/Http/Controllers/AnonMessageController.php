@@ -36,6 +36,11 @@ class AnonMessageController extends Controller
         return view('anon.room', compact('room', 'messages'));
     }
 
+    public function delete($id)
+    {
+        $message = \App\Models\AnonMessage::findOrFail($id);
+        $message->delete();
 
-
+        return back()->with('success', 'Pesan anonim berhasil dihapus!');
+    }
 }

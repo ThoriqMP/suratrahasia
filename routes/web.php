@@ -67,3 +67,6 @@ Route::post('/anon/send/{kode_form}', [AnonMessageController::class, 'store'])->
 
 // untuk melihat pesan (hanya pemilik room)
 Route::get('/anon/{kode}', [AnonMessageController::class, 'showMessages'])->name('anon.show');
+
+// untuk menghapus pesan anonim
+Route::delete('/anon/message/{id}', [AnonMessageController::class, 'delete'])->name('anon.message.delete');

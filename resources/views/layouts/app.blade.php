@@ -89,6 +89,11 @@
                 <div class="hidden sm:flex space-x-6 items-center">
                     <a href="/" class="text-sm font-semibold text-slate-300 hover:text-white transition-colors">Beranda</a>
                     <a href="/tentang" class="text-sm font-semibold text-slate-300 hover:text-white transition-colors">Tentang</a>
+                    @if(!auth()->check() || !auth()->user()->is_admin)
+                        <a href="/anon" class="text-sm font-semibold text-pink-400 hover:text-pink-300 transition-colors flex items-center gap-1">
+                            <span>💬</span> Bisik Rahasia
+                        </a>
+                    @endif
                     
                     @auth
                         @if(auth()->user()->is_admin)
@@ -148,6 +153,13 @@
                     <span class="text-xl">🏠</span>
                     <span class="text-[10px] font-bold uppercase tracking-wider">Beranda</span>
                 </a>
+                
+                @if(!auth()->check() || !auth()->user()->is_admin)
+                <a href="/anon" class="flex flex-col items-center gap-1 text-slate-300 hover:text-pink-400 transition-colors">
+                    <span class="text-xl">💬</span>
+                    <span class="text-[10px] font-bold uppercase tracking-wider">Bisik</span>
+                </a>
+                @endif
                 
                 @if(!auth()->check() || !auth()->user()->is_admin)
                 <a href="/create" class="flex flex-col items-center gap-1 -mt-6 relative group">
