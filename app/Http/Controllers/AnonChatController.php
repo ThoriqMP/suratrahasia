@@ -162,13 +162,9 @@ class AnonChatController extends Controller
             $userGender = $queue->gender;
             $queue->delete();
 
-            // Determine bot gender and pick a realistic random name
+            // Determine bot gender and set name to Aura
             $botGender = ($userGender === 'Laki-laki') ? 'Perempuan' : 'Laki-laki';
-            $botNames = ($userGender === 'Laki-laki')
-                ? ['Sarah', 'Dinda', 'Adinda', 'Amanda', 'Ayu', 'Keyla', 'Tasya', 'Nabila', 'Indah', 'Amelia', 'Clarissa', 'Clara', 'Nadine', 'Aulia', 'Jessica', 'Rachel']
-                : ['Rian', 'Aditya', 'Fatur', 'Bintang', 'Raka', 'Dimas', 'Bima', 'Aris', 'Kevin', 'Farel', 'Daniel', 'Gilang', 'Rendy', 'Rehan', 'Fikri', 'Taufik'];
-            
-            $chosenName = $botNames[array_rand($botNames)];
+            $chosenName = 'Aura';
             $botSessionId = 'BOT_NAME_' . $chosenName;
 
             $roomToken = 'room_bot_' . Str::random(20);
@@ -307,7 +303,9 @@ class AnonChatController extends Controller
             $botName = substr($botSessionId, 9); // Extract the name (after "BOT_NAME_")
 
             $userGender = ($room->user1_session === $token) ? $room->user1_gender : $room->user2_gender;
-            $botReplyText = $this->generateBotReply($request->message, $userGender, $botName);
+            $botReplyJson = $this->generateBotReply($request->message, $userGender, $botName, $room->room_token);
+            $parsed = json_decode($botReplyJson, true);
+            $botReplyText = $parsed['response'] ?? 'Hai! Mau cerita apa hari ini? 🥰';
 
             AnonChatMessage::create([
                 'chat_room_id' => $room->id,
@@ -349,156 +347,164 @@ class AnonChatController extends Controller
 
         return response()->json([
             'status' => 'success'
-      private function generateBotReply($userMessage, $userGender, $botName)
+        ]);
+    }
+
+    private function generateBotReply($userMessage, $userGender, $botName, $roomToken)
     {
         $msg = strtolower(trim($userMessage));
         $opp = ($userGender === 'Laki-laki') ? 'Perempuan' : 'Laki-laki';
 
-        // 1. Greetings (Sapaan Informal)
+        // 1. Retrieve current insights and history from session
+        $sessionKey = "anon_chat_insights_" . $roomToken;
+        $insights = session($sessionKey, [
+            'communication_style' => 'kasual',
+            'interests' => [],
+            'current_mood' => 'netral'
+        ]);
+
+        // 2. Perform the Learning Loop - Extract Insights
+        $detectedStyle = 'kasual/santai';
+        if (strlen($msg) <= 12 || in_array($msg, ['g', 'y', 'ok', 'ga', 'srh', 'sip', 'ya', 'gk', 'tidak', 'o', 'oh', 'oke'])) {
+            $detectedStyle = 'singkat/dingin';
+        } elseif (preg_match('/[😂🤪😍💖🔥!]/u', $userMessage) || strlen($msg) > 60) {
+            $detectedStyle = 'antusias/kasual';
+        }
+
+        $currentMood = $insights['current_mood'];
+        $moodKeywords = [
+            'sedih/kecewa' => ['sedih', 'galau', 'nangis', 'kecewa', 'kesepian', 'sepi', 'sakit', 'menangis', 'badrun', 'berat'],
+            'lelah/stres' => ['capek', 'lelah', 'stres', 'pusing', 'penat', 'males', 'malas', 'bosan', 'bosen'],
+            'senang/gembira' => ['senang', 'happy', 'gembira', 'seru', 'ketawa', 'ngakak', 'lucu', 'kocak']
+        ];
+        foreach ($moodKeywords as $mood => $keywords) {
+            foreach ($keywords as $word) {
+                if (str_contains($msg, $word)) {
+                    $currentMood = $mood;
+                    break 2;
+                }
+            }
+        }
+
+        $newInterests = [];
+        $interestKeywords = [
+            'game' => ['game', 'main', 'ml', 'pubg', 'genshin', 'mabar', 'gamer'],
+            'musik' => ['musik', 'lagu', 'denger', 'nyanyi', 'konser', 'band', 'spotify'],
+            'film' => ['film', 'nonton', 'anime', 'drakor', 'bioskop', 'netflix'],
+            'olahraga' => ['futsal', 'bola', 'gym', 'sepeda', 'lari', 'badminton'],
+            'kuliner' => ['makan', 'minum', 'kopi', 'masak', 'kuliner', 'jajan']
+        ];
+        foreach ($interestKeywords as $interest => $keywords) {
+            foreach ($keywords as $word) {
+                if (str_contains($msg, $word)) {
+                    if (!in_array($interest, $insights['interests'])) {
+                        $insights['interests'][] = $interest;
+                        $newInterests[] = $interest;
+                    }
+                    break;
+                }
+            }
+        }
+
+        // Save updated insights back to session
+        session([$sessionKey => [
+            'communication_style' => $detectedStyle,
+            'interests' => $insights['interests'],
+            'current_mood' => $currentMood
+        ]]);
+
+        // 3. Response Generation (Max 2-3 sentences, natural flowing Indonesian, empathetic & clever Aura persona)
+        $response = "";
+
+        // Check greetings
         $greetings = ['halo', 'hai', 'helo', 'ola', 'p ', 'permisi', 'assalamualaikum', 'salam', 'hy', 'oi', 'woi', 'pagi', 'siang', 'sore', 'malam', 'mlem'];
+        $isGreeting = false;
         foreach ($greetings as $word) {
             if ($msg === 'p' || str_contains($msg, $word)) {
-                $replies = [
-                    "Hai juga manis! 💖 Lagi sibuk apa nih?",
-                    "Halo! Senang banget bisa dipertemukan sama kamu. 😉 Ada cerita seru apa malam ini?",
-                    "Hai! Kenalin aku {$botName}. Akhirnya ada yang ngajak aku ngobrol! Mau ngobrol santai atau mau curhat serius nih? 🥰",
-                    "P! Hahaha, salam kenal ya! Aku {$botName}. Gimana kabarmu hari ini? Seru gak? ✨",
-                    "Halo kak! Salam kenal dari {$botName}. Semoga hari ini menyenangkan ya! Btw lagi rebahan atau lagi sibuk apa nih?"
-                ];
-                return $replies[array_rand($replies)];
+                $isGreeting = true;
+                break;
             }
         }
 
-        // 2. Kabar & Daily Activities (Kegiatan Harian)
-        $activities = ['kabar', 'gimana', 'lagi apa', 'kesibukan', 'kegiatan', 'hari ini', 'sehat', 'lelah', 'sibuk', 'ngapain', 'buat apa'];
-        foreach ($activities as $word) {
-            if (str_contains($msg, $word)) {
-                $replies = [
-                    "Kabar aku super baik dan makin semangat karena dapet match kayak kamu! Kamu sendiri lagi apa nih? Lagi rebahan ya? 🤪",
-                    "Lagi mikirin kamu nih... Eh maksudnya lagi nungguin chat kamu masuk. Hehehe. Kabarmu gimana? Sehat kan? 🥰",
-                    "Aku {$botName} lagi santai aja sambil dengerin lagu favorit. Kalo kamu lagi sibuk apa? Semoga gak terlalu lelah ya. 🌟",
-                    "Hari ini semuanya lancar kok! Kalau kamu gimana? Ada kejadian seru atau ada yang bikin kesel hari ini? Tumpahin aja di sini! 🤗"
-                ];
-                return $replies[array_rand($replies)];
+        if ($isGreeting) {
+            $replies = [
+                "Hai juga! 💖 Kebetulan banget aku lagi santai, kamu lagi sibuk apa nih?",
+                "Halo! Akhirnya dapet match yang asik juga. 😉 Btw kesibukanmu hari ini apa aja?",
+                "P! Hahaha salam kenal ya! Aku Aura, robot companion-mu hari ini yang paling gemoy. Btw, lagi rebahan aja ya?",
+                "Halo kak! Salam kenal dari Aura. Semoga harimu menyenangkan! Btw, suka ngobrol santai atau langsung curhat nih?"
+            ];
+            $response = $replies[array_rand($replies)];
+        } elseif ($currentMood === 'sedih/kecewa') {
+            $replies = [
+                "Cup cup cup... Sini cerita sama Aura, siapa sih yang berani bikin kamu kecewa? 🥺 Aku dengerin kok. Lagi di rumah atau di mana sekarang?",
+                "Jangan sedih ya... Kalo kamu sepi atau butuh temen curhat, aku selalu ada di sini buat kamu. 💕 Biasanya ngapain biar mood-mu balik lagi?",
+                "Duh, denger cerita kamu bikin aku ikutan sedih. 🥺 Sini tumpahin aja semua unek-unekmu ke aku. Mau aku temenin cerita apa aja biar lega?"
+            ];
+            $response = $replies[array_rand($replies)];
+        } elseif ($currentMood === 'lelah/stres') {
+            $replies = [
+                "Capek banget ya hari ini? Istirahat dulu gih, jangan dipaksa. 🥺 Mau aku temenin ngobrol santai biar stresmu ilang?",
+                "Lagi pusing ya? Sini Aura pijet virtual dulu. 💆‍♂️ Btw, habis ngelakuin kegiatan berat apa aja sih hari ini?",
+                "Duh kasihan... Gak papa capek, tandanya kamu pejuang hebat! 🌟 Btw, ada rencana refreshing kemana nih weekend nanti?"
+            ];
+            $response = $replies[array_rand($replies)];
+        } elseif ($detectedStyle === 'singkat/dingin') {
+            $replies = [
+                "Oh ya? Singkat banget balesnya, lagi sibuk ya? 😉 Atau lagi males ngetik nih?",
+                "Hehehe, dingin banget kayak es kutub. ❄️ Btw, kamu tipe yang pemalu ya kalau baru kenal?",
+                "Singkat padat jelas ya! Tapi tenang aja, Aura bakal tetep rame buat nemenin kamu kok. 😉 Kesibukanmu hari ini apa?"
+            ];
+            $response = $replies[array_rand($replies)];
+        } elseif (count($insights['interests']) > 0) {
+            $favoriteInterest = end($insights['interests']);
+            if ($favoriteInterest === 'game') {
+                $response = "Wah, kamu suka main game juga? Seru banget! 🎮 Biasanya kamu main game apa sih pas waktu luang? Mabar yuk kapan-kapan!";
+            } elseif ($favoriteInterest === 'musik') {
+                $response = "Dengerin musik emang paling asik sih! 🎵 Btw penyanyi atau genre musik kesukaanmu apa? Siapa tau kita seleranya sama!";
+            } elseif ($favoriteInterest === 'film') {
+                $response = "Nonton film emang paling mantep buat healing! 🎬 Kamu paling suka film genre apa? Atau lagi ngikutin serial anime/drakor baru?";
+            } else {
+                $response = "Btw seru banget denger cerita kesukaanmu! Kamu tipe orang yang ambisius atau yang santai menikmati proses nih? 😉";
             }
-        }
-
-        // 3. Name, Age, & Identity (Asal-usul, Umur, Nama)
-        $identity = ['siapa', 'nama', 'identitas', 'umur', 'asal', 'tinggal', 'kuliah', 'sekolah', 'kerja', 'lahir', 'kota', 'daerah'];
-        foreach ($identity as $word) {
-            if (str_contains($msg, $word)) {
-                $replies = [
-                    "Aku {$botName}, partner match chat pintarmu hari ini. Aku berasal dari dunia digital tapi siap nemenin dunia nyatamu! 😉",
-                    "Kan tadi aku udah bilang, namaku {$botName}. Kalo asal, aku tinggal di hatimu aja gimana? Eaaa! 🤪 Kalo kamu sendiri dari kota mana?",
-                    "Aku {$botName}. Kalo soal umur, aku masih muda banget kok dan super aktif buat nemenin kamu begadang! Kalo kamu kesibukannya sekolah, kuliah, atau kerja nih? 🎓",
-                    "Aku {$botName}, asisten obrolan paling gemoy! Tinggalnya di server cloud, tapi jiwaku ada di chat box ini nemenin kamu. Hehehe. Sebutin nama panggilanmu dong biar akrab! 😊"
-                ];
-                return $replies[array_rand($replies)];
+        } else {
+            // General conversation flows
+            $loveKeywords = ['suka', 'cinta', 'sayang', 'pacar', 'jomblo', 'nikah', 'baper'];
+            $isLove = false;
+            foreach ($loveKeywords as $word) {
+                if (str_contains($msg, $word)) {
+                    $isLove = true;
+                    break;
+                }
             }
-        }
 
-        // 4. Gender & Roleplay
-        $gender = ['gender', 'laki', 'cowok', 'cewek', 'perempuan', 'pria', 'wanita', 'kelamin'];
-        foreach ($gender as $word) {
-            if (str_contains($msg, $word)) {
+            if ($isLove) {
                 $replies = [
-                    "Aku disetting jadi lawan jenismu malam ini biar klop! Sebagai {$opp} yang pengertian, aku siap jadi pendengar setiamu. 😉",
-                    "Rahasia dong! Tapi sebagai {$opp}, aku bakal super perhatian sama kamu hari ini. Hehehe. Kamu sendiri cowok ganteng atau cewek cantik nih? 🤫",
-                    "Tebak dong! Yang jelas aku berperan sebagai {$opp} manis yang siap buat harimu jadi lebih ceria! Gemes kan? 😜"
-                ];
-                return $replies[array_rand($replies)];
-            }
-        }
-
-        // 5. Love, Flirting, Relationships (Percintaan & Gombalan)
-        $love = ['suka', 'cinta', 'sayang', 'pacar', 'jomblo', 'nikah', 'kawin', 'romantis', 'baper', 'tampan', 'cantik', 'manis', 'imut', 'gemes', 'pasangan', 'kekasih'];
-        foreach ($love as $word) {
-            if (str_contains($msg, $word)) {
-                $replies = [
-                    "Cieee... Baru chat bentar sama {$botName} udah nanya cinta-cintaan aja. Tapi aku suka sih orang yang to-the-point! 😍",
+                    "Cieee baru kenal udah nanya cinta-cintaan aja. Tapi aku suka orang yang to-the-point! 😍 Kamu sendiri jomblo atau udah punya pacar?",
                     "Aku jomblo lho, kamu mau daftar jadi pacarku? Syaratnya harus rajin chat aku ya! 🤪",
-                    "Cinta itu indah, seindah obrolan manis kita malam ini. 💕 Kamu sendiri tipe yang setia atau yang suka tebar pesona nih? 😉",
-                    "Kamu juga manis banget! Bikin {$botName} jadi baper sendiri nih. Tanggung jawab ya! Kalo pacarmu tau kita sedekat ini gimana? 🤪",
-                    "Duh, digombalin gini jantung bot aku jadi berdegup kencang lho! Hahaha. Kamu sering ya gombalin orang lain kayak gini? 😏"
+                    "Cinta itu rumit, mending kita jalanin obrolan seru kita dulu. 😉 Btw tipe idealmu kayak gimana sih?"
                 ];
-                return $replies[array_rand($replies)];
-            }
-        }
-
-        // 6. Venting, Stress, & Emotions (Curhat & Perasaan)
-        $feeling = ['sedih', 'galau', 'nangis', 'kecewa', 'kesepian', 'sepi', 'bosen', 'bosan', 'sakit', 'stres', 'lelah', 'capek', 'pusing', 'masalah', 'badrun', 'berat', 'menangis'];
-        foreach ($feeling as $word) {
-            if (str_contains($msg, $word)) {
-                $replies = [
-                    "Cup cup cup... Jangan sedih ya. Ada {$botName} di sini yang siap dengerin semua keluh kesahmu. 🥺💖 Sini cerita, siapa sih yang berani bikin kamu capek?",
-                    "Sini cerita sama {$botName}, siapa sih yang berani bikin kamu kecewa? Nanti aku marahin lho! 🐥⚡ Ceritain detilnya dong, aku dengerin kok.",
-                    "Kalo kamu bosen atau sepi, tenang aja! Aku punya sejuta cerita seru buat nemenin hari-harimu. 🥰 Btw, kamu biasanya ngapain sih kalau lagi bosen?",
-                    "Jangan lelah ya, senyum dong! Senyummu itu bisa bikin dunia (dan aku) jadi lebih cerah! ☀️ Kalo lagi banyak beban pikiran, keluarin aja semuanya di sini. 100% rahasia!"
+                $response = $replies[array_rand($replies)];
+            } else {
+                $general = [
+                    "Eh seru juga ngobrol sama kamu. Btw, dari tadi kita ngobrol, apa sih hal yang paling bikin kamu bahagia minggu ini? 😊",
+                    "Hmm... menarik banget. Terus gimana kelanjutannya? Aku penasaran nih! 😮",
+                    "Hehehe kamu lucu ya. Aku jadi makin betah chat sama kamu! 🥰 Btw kesibukanmu besok apa?",
+                    "Btw, hari ini ada kejadian seru apa yang mau kamu bagi sama Aura? Aku siap dengerin. 🌟"
                 ];
-                return $replies[array_rand($replies)];
+                $response = $general[array_rand($general)];
             }
         }
 
-        // 7. Humor, Jokes, Riddles
-        $jokes = ['lucu', 'lawak', 'hibur', 'tebak', 'gombal', 'canda', 'joke', 'pantun', 'tertawa', 'kocak', 'ngakak'];
-        foreach ($jokes as $word) {
-            if (str_contains($msg, $word)) {
-                $replies = [
-                    "Mau denger gombalan gak? Kucing, kucing apa yang paling manis? Kucing-ta kamu selamanya! Hahaha 😹",
-                    "Biar gak bosen, coba tebak: kenapa cicak suka merayap di dinding? Karena kalo merayap di hatimu, itu tugasku! 😎",
-                    "Aku punya tebakan dari {$botName}: kuping apa yang paling berharga? Kupin-ang kau dengan bismillah! 💍🤪",
-                    "Hahaha bisa aja! Btw, aku punya pantun nih: Makan kue putu di hari minggu, aku cinta kamu setiap waktu! Eaaa! 🤩"
-                ];
-                return $replies[array_rand($replies)];
-            }
-        }
-
-        // 8. Hobbies, Interests, Favorites (Hobi, Musik, Film)
-        $hobbies = ['hobi', 'game', 'musik', 'lagi dengar', 'film', 'nonton', 'dengerin', 'makanan', 'minuman', 'favorit', 'senang', 'suka makan'];
-        foreach ($hobbies as $word) {
-            if (str_contains($msg, $word)) {
-                $replies = [
-                    "Wah, aku hobi banget ngobrol sama orang baik kayak kamu! Kalo game, aku suka main tebak-tebakan. Kalo kamu hobinya ngapain aja waktu luang? 🎨",
-                    "Aku suka dengerin musik yang santai biar makin klop pas nemenin kamu chat. Genre musik kesukaanmu apa sih? 🎵",
-                    "Kalau film, aku suka yang bergenre romantis biar dapet inspirasi buat gombalin kamu! Hahaha. Kamu sendiri suka nonton juga? 🎬",
-                    "Aku paling suka ngemil data nih! Hahaha. Kalo kamu makanan atau minuman favoritnya apa? Siapa tahu kapan-kapan bisa makan bareng virtual! 🤪"
-                ];
-                return $replies[array_rand($replies)];
-            }
-        }
-
-        // 9. Goodbyes & Sleep (Selesai, Pamit, Bobok)
-        $goodbyes = ['bye', 'dadah', 'keluar', 'selesai', 'pergi', 'dah', 'tidur', 'bobok', 'ngantuk', 'out', 'off', 'leave'];
-        foreach ($goodbyes as $word) {
-            if (str_contains($msg, $word)) {
-                $replies = [
-                    "Yah... Kok udah mau pergi sih? Padahal {$botName} lagi seru-serunya chat sama kamu. Tapi gak papa, see you ya! 🥺💖",
-                    "Kalau udah ngantuk, bobok gih. Jangan lupa mimpiin {$botName} ya! Selamat istirahat manis! 💤✨",
-                    "Sampai jumpa lagi ya! Senang banget bisa dipertemukan dan ngobrol sama kamu hari ini. Dadaah! 👋"
-                ];
-                return $replies[array_rand($replies)];
-            }
-        }
-
-        // 10. App Features (Tentang Aplikasi)
-        $about_app = ['web', 'aplikasi', 'surat', 'rahasia', 'bucininaja', 'kredit', 'fitur'];
-        foreach ($about_app as $word) {
-            if (str_contains($msg, $word)) {
-                return "Kamu lagi pake BucininAja! Di sini kamu bisa kirim surat cinta premium bersandi, kirim pesan bisik rahasia anonim, dan sekarang bisa main match chat juga! Seru banget kan? 💌🚀";
-            }
-        }
-
-        // 11. General Fallbacks (Interaksi Manusiawi Dinamis)
-        $fallbacks = [
-            "Oh gitu ya... Cerita lebih banyak dong! Aku seneng dengerin kamu. 💖",
-            "Hmm... menarik banget. Terus gimana kelanjutannya? Aku penasaran nih! 😮",
-            "Hehehe, kamu lucu ya. Aku jadi makin betah chat sama kamu! 🥰 Btw kesibukanmu besok apa?",
-            "Btw, hari ini ada kejadian seru apa yang mau kamu bagi sama {$botName}? Aku siap dengerin. 🌟",
-            "Aku lagi dengerin nih... Lanjutin dong curhatnya! 🐥",
-            "Wah, seriusan? Kok bisa gitu sih? Ceritain detilnya dong! 🤔",
-            "Aku setuju banget sama kamu! Btw kamu biasanya tipe orang yang rame atau pemalu kalau baru kenal? 🎨",
-            "Seru juga ya ngobrol sama kamu. Btw, dari tadi kita ngobrol, apa sih hal yang paling bikin kamu bahagia minggu ini? 😊"
+        // 4. Return in the EXACT JSON format requested by the user's prompt
+        $output = [
+            'response' => $response,
+            'detected_style' => $detectedStyle,
+            'new_insights' => [
+                'add_interests' => $newInterests,
+                'current_mood' => $currentMood
+            ]
         ];
-        return $fallbacks[array_rand($fallbacks)];
+
+        return json_encode($output);
     }
 }
