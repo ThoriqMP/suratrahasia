@@ -111,7 +111,7 @@
         @else
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
                 @foreach($messages as $index => $message)
-                    <div @click="openMessage('{{ addslashes($message->isi) }}', '{{ $message->created_at->format('d M Y, H:i') }}', '{{ route('anon.message.delete', $message->id) }}')" 
+                    <div @click="openMessage({{ json_encode($message->isi) }}, '{{ $message->created_at->format('d M Y, H:i') }}', '{{ route('anon.message.delete', $message->id) }}')" 
                          class="group relative aspect-square rounded-2xl bg-gradient-to-br from-[#ff3f6c]/10 to-[#ff6b3f]/10 border border-[#ff3f6c]/20 hover:border-[#ff3f6c]/50 hover:from-[#ff3f6c]/20 hover:to-[#ff6b3f]/20 shadow-md cursor-pointer transition-all duration-300 flex flex-col items-center justify-center gap-2 text-center select-none overflow-hidden active:scale-95">
                         <div class="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none"></div>
                         
@@ -381,5 +381,16 @@
         0%, 100% { transform: translateY(0); }
         50% { transform: translateY(-6px); }
     }
+    
+    [x-cloak] {
+        display: none !important;
+    }
 </style>
+
+@once
+@push('scripts')
+<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+@endpush
+@endonce
+
 @endsection

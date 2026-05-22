@@ -117,5 +117,16 @@
         0%, 100% { transform: translateY(0); }
         50% { transform: translateY(-8px); }
     }
+    
+    [x-cloak] {
+        display: none !important;
+    }
 </style>
+
+@once
+@push('scripts')
+<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+@endpush
+@endonce
+
 @endsection
