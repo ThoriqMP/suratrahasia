@@ -51,6 +51,25 @@
         </div>
     </div>
 
+    <!-- Bisik Rahasia Promo Card -->
+    <div class="glass-card p-6 mb-8 bg-gradient-to-r from-[#ff3f6c]/10 to-[#ff6b3f]/10 border border-[#ff3f6c]/20 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6 hover:scale-[1.01] transition-transform duration-300 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-tr from-pink-500/5 to-transparent pointer-events-none"></div>
+        <div class="flex items-center gap-4 relative z-10">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#ff3f6c]/20 to-[#ff6b3f]/20 border border-pink-500/30 flex items-center justify-center text-2xl shadow-lg">
+                🤫
+            </div>
+            <div>
+                <h4 class="text-lg font-black text-white tracking-tight flex items-center gap-2">
+                    Bisik Rahasia <span class="px-2 py-0.5 rounded-full bg-pink-500/20 text-[9px] font-black text-pink-400 uppercase tracking-widest animate-pulse">Hot</span>
+                </h4>
+                <p class="text-slate-400 text-xs mt-1">Dapatkan bisikan rahasia, saran jujur, atau curhatan anonim dari teman-temanmu!</p>
+            </div>
+        </div>
+        <a href="/anon" class="w-full md:w-auto px-6 py-3 bg-gradient-to-r from-[#ff3f6c] to-[#ff6b3f] hover:from-[#e13054] hover:to-[#eb592c] text-white font-extrabold rounded-2xl text-xs uppercase tracking-wider transition-all transform hover:-translate-y-0.5 text-center shadow-lg shadow-pink-500/10 shrink-0">
+            💬 Buka Fitur Bisik
+        </a>
+    </div>
+
     <!-- Letter History -->
     <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2"><span>💌</span> Riwayat Surat Kamu</h3>
     

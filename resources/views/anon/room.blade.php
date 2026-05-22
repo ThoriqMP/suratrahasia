@@ -182,6 +182,29 @@
                         class="w-full py-3.5 bg-gradient-to-r from-orange-500 via-pink-500 to-rose-500 hover:from-orange-600 hover:via-pink-600 hover:to-rose-600 text-white font-extrabold rounded-xl text-xs uppercase tracking-wider transition-all transform hover:-translate-y-0.5 shadow-lg shadow-pink-500/15 flex items-center justify-center gap-2">
                     <span>📸</span> Unduh Gambar Instagram (PNG)
                 </button>
+
+                <!-- Copy Link Sticker Shortcut -->
+                <button @click="copyToClipboard('linkSend', 'send')"
+                        class="w-full py-3 bg-slate-900 border border-white/10 hover:border-pink-500/50 hover:bg-slate-950 text-slate-300 hover:text-white font-bold rounded-xl text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2">
+                    <span>🔗</span> <span x-text="copiedSend ? 'Link Stiker Tersalin! ✅' : 'Salin Link Stiker Tautan Instagram'"></span>
+                </button>
+
+                <!-- Step-by-Step Instagram Story Sharing Guide -->
+                <div class="p-4 bg-slate-950/60 rounded-2xl border border-white/5 text-left space-y-2">
+                    <p class="text-[11px] font-black text-pink-400 uppercase tracking-widest flex items-center gap-1.5">
+                        <span>📸</span> Cara Share ke Instagram Stories:
+                    </p>
+                    <ol class="text-[10px] text-slate-300 list-decimal pl-4 space-y-1 font-medium leading-relaxed">
+                        <li>Klik <strong>Unduh Gambar (PNG)</strong> di atas untuk menyimpan kartu ke hp.</li>
+                        <li>Klik <strong>Salin Link Stiker</strong> untuk menyalin link kirim pesan kamu.</li>
+                        <li>Buka Instagram Story, buat story baru, dan pilih gambar kartu yang diunduh.</li>
+                        <li>Ketuk ikon <strong>Stiker</strong> di kanan atas, lalu pilih stiker <strong>Tautan (Link)</strong>.</li>
+                        <li>Tempelkan (paste) link yang telah disalin dan taruh stiker tautan tersebut tepat di atas gambar!</li>
+                    </ol>
+                    <p class="text-[9px] text-slate-500 italic font-medium leading-normal mt-1">
+                        *Dengan stiker ini, teman/followers dapat mengetuk langsung dari Instagram Story Anda untuk mengirimkan balasan pesan rahasia!
+                    </p>
+                </div>
                 
                 <div class="flex gap-3">
                     <button @click="modalOpen = false" 
