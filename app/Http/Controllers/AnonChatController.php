@@ -340,7 +340,9 @@ class AnonChatController extends Controller
         return response()->json([
             'status' => 'success'
         ]);
-     private function generateBotReply($userMessage, $userGender, $botName)
+    }
+
+    private function generateBotReply($userMessage, $userGender, $botName)
     {
         $msg = strtolower(trim($userMessage));
 
