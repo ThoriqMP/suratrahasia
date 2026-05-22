@@ -191,6 +191,7 @@ function anonChat() {
         isTyping: false,
         shownMessageIds: [],
         typingQueue: [],
+        typingMessageIds: [],
         isTypingInProgress: false,
 
         init() {
@@ -275,6 +276,7 @@ function anonChat() {
             this.partnerStatus = 'active';
             this.shownMessageIds = [];
             this.typingQueue = [];
+            this.typingMessageIds = [];
             this.isTyping = false;
             this.isTypingInProgress = false;
             
@@ -294,21 +296,27 @@ function anonChat() {
                 
                 // Process messages list
                 const serverMessages = data.messages;
+                const isBotRoom = this.roomToken && this.roomToken.startsWith('room_bot_');
+
                 serverMessages.forEach(msg => {
-                    if (msg.is_mine || this.shownMessageIds.includes(msg.id)) {
-                        if (!this.messages.some(m => m.id === msg.id)) {
-                            this.messages.push(msg);
-                            if (!this.shownMessageIds.includes(msg.id)) {
-                                this.shownMessageIds.push(msg.id);
-                            }
-                            this.scrollToBottom();
-                        }
+                    const isKnown = this.messages.some(m => m.id === msg.id) || 
+                                    this.typingQueue.some(m => m.id === msg.id) || 
+                                    this.typingMessageIds.includes(msg.id) ||
+                                    this.shownMessageIds.includes(msg.id);
+
+                    if (isKnown) {
+                        return;
+                    }
+
+                    if (msg.is_mine || !isBotRoom) {
+                        this.messages.push(msg);
+                        this.shownMessageIds.push(msg.id);
+                        this.scrollToBottom();
                     } else {
-                        // Partner/Bot message that has not been shown/typed yet!
-                        if (!this.messages.some(m => m.id === msg.id) && !this.typingQueue.some(m => m.id === msg.id)) {
-                            this.typingQueue.push(msg);
-                            this.processTypingQueue();
-                        }
+                        // Bot message that needs typing simulation
+                        this.typingQueue.push(msg);
+                        this.typingMessageIds.push(msg.id);
+                        this.processTypingQueue();
                     }
                 });
 
