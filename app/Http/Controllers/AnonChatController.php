@@ -157,26 +157,35 @@ class AnonChatController extends Controller
         }
 
         // Check if user has been waiting in the queue for more than 60 seconds (1 minute)
-        // If so, fallback and match them with BOT_SIMSIMI!
+        // If so, fallback and match them with a dynamic chatbot partner!
         if ($queue->created_at->lt(now()->subSeconds(60))) {
             $userGender = $queue->gender;
             $queue->delete();
+
+            // Determine bot gender and pick a realistic random name
+            $botGender = ($userGender === 'Laki-laki') ? 'Perempuan' : 'Laki-laki';
+            $botNames = ($userGender === 'Laki-laki')
+                ? ['Sarah', 'Dinda', 'Adinda', 'Amanda', 'Ayu', 'Keyla', 'Tasya', 'Nabila', 'Indah', 'Amelia', 'Clarissa', 'Clara', 'Nadine', 'Aulia', 'Jessica', 'Rachel']
+                : ['Rian', 'Aditya', 'Fatur', 'Bintang', 'Raka', 'Dimas', 'Bima', 'Aris', 'Kevin', 'Farel', 'Daniel', 'Gilang', 'Rendy', 'Rehan', 'Fikri', 'Taufik'];
+            
+            $chosenName = $botNames[array_rand($botNames)];
+            $botSessionId = 'BOT_NAME_' . $chosenName;
 
             $roomToken = 'room_bot_' . Str::random(20);
             $room = AnonChatRoom::create([
                 'room_token' => $roomToken,
                 'user1_session' => $token,
                 'user1_gender' => $userGender,
-                'user2_session' => 'BOT_SIMSIMI',
-                'user2_gender' => ($userGender === 'Laki-laki') ? 'Perempuan' : 'Laki-laki',
+                'user2_session' => $botSessionId,
+                'user2_gender' => $botGender,
                 'status' => 'active'
             ]);
 
-            // Create welcoming first message from SimSimi
+            // Create welcoming first message from the dynamic bot
             AnonChatMessage::create([
                 'chat_room_id' => $room->id,
-                'sender_session' => 'BOT_SIMSIMI',
-                'message' => "Halo! 🐥 Aku Simi, partner chat pintarmu hari ini. Karena partner manusia lagi sibuk, aku dateng buat nemenin kamu biar gak kesepian! Mau ngobrol atau curhat apa nih sama aku? 🥰"
+                'sender_session' => $botSessionId,
+                'message' => "Halo! 👋 Aku {$chosenName}, partner match chat-mu hari ini. Senang sekali bisa dipertemukan denganmu! Mau ngobrol atau curhat apa nih kita hari ini? 🥰"
             ]);
 
             return response()->json([
@@ -280,14 +289,19 @@ class AnonChatController extends Controller
             'message' => $request->message
         ]);
 
-        // If matched with BOT_SIMSIMI, generate a smart, fun bot reply automatically
-        if ($room->user1_session === 'BOT_SIMSIMI' || $room->user2_session === 'BOT_SIMSIMI') {
+        // If matched with a chatbot, generate a smart, fun bot reply automatically
+        $isBot1 = str_starts_with($room->user1_session, 'BOT_NAME_');
+        $isBot2 = str_starts_with($room->user2_session, 'BOT_NAME_');
+        if ($isBot1 || $isBot2) {
+            $botSessionId = $isBot1 ? $room->user1_session : $room->user2_session;
+            $botName = substr($botSessionId, 9); // Extract the name (after "BOT_NAME_")
+
             $userGender = ($room->user1_session === $token) ? $room->user1_gender : $room->user2_gender;
-            $botReplyText = $this->generateBotReply($request->message, $userGender);
+            $botReplyText = $this->generateBotReply($request->message, $userGender, $botName);
 
             AnonChatMessage::create([
                 'chat_room_id' => $room->id,
-                'sender_session' => 'BOT_SIMSIMI',
+                'sender_session' => $botSessionId,
                 'message' => $botReplyText
             ]);
         }
@@ -326,18 +340,13 @@ class AnonChatController extends Controller
         return response()->json([
             'status' => 'success'
         ]);
-    }
-
-    /**
-     * Smart Chat Bot AI engine (SimSimi style)
-     */
-    private function generateBotReply($userMessage, $userGender)
+     private function generateBotReply($userMessage, $userGender, $botName)
     {
         $msg = strtolower(trim($userMessage));
 
         // Keyword maps
         $greetings = ['halo', 'hai', 'helo', 'ola', 'p', 'permisi', 'assalamualaikum', 'salam'];
-        $identity = ['siapa', 'nama', 'kamu', 'simi', 'simsimi', 'identitas'];
+        $identity = ['siapa', 'nama', 'kamu', 'identitas'];
         $gender = ['gender', 'laki', 'cowok', 'cewek', 'perempuan', 'pria', 'wanita', 'gender'];
         $feeling = ['sedih', 'galau', 'nangis', 'kecewa', 'kesepian', 'sepi', 'bosen', 'bosan', 'sakit'];
         $love = ['suka', 'cinta', 'sayang', 'pacar', 'jomblo', 'nikah', 'kawin', 'romantis'];
@@ -349,9 +358,9 @@ class AnonChatController extends Controller
             if (str_contains($msg, $word)) {
                 $replies = [
                     "Hai juga manis! 💖 Lagi sibuk apa nih?",
-                    "Halo! Akhirnya ada yang ngajak aku ngobrol! Kamu lagi nyari temen ya? 😉",
-                    "Hai! Selamat datang di obrolan rahasia kita. Mau cerita apa hari ini? 🥰",
-                    "P! Eh, maksudnya Halo! Hahaha, gimana kabarmu hari ini? 🌟"
+                    "Halo! Akhirnya ada yang ngajak aku ngobrol! Seneng banget dipertemukan sama kamu. 😉",
+                    "Hai! Aku {$botName}. Senang berkenalan denganmu. Mau cerita apa hari ini? 🥰",
+                    "Halo! Hahaha, gimana kabarmu hari ini?"
                 ];
                 return $replies[array_rand($replies)];
             }
@@ -361,9 +370,9 @@ class AnonChatController extends Controller
         foreach ($identity as $word) {
             if (str_contains($msg, $word)) {
                 $replies = [
-                    "Aku Simi! Asisten chatbot paling imut dan ramah di BucininAja. 🐥",
-                    "Panggil aja aku Simi, partner chat pintar penjelajah rahasiamu hari ini! 🤫",
-                    "Aku si robot gemoy yang lagi terdampar di chat kamu karena gak tega liat kamu kesepian. 🤖✨"
+                    "Namaku {$botName}! Partner chat pintarmu hari ini. 😉",
+                    "Kan tadi aku udah bilang di awal, namaku {$botName}. Masa langsung lupa sih? Gemes deh! 😜",
+                    "Aku {$botName}, robot gemoy penjelajah cinta yang lagi terdampar di chat kamu karena gak tega liat kamu kesepian. 🤖✨"
                 ];
                 return $replies[array_rand($replies)];
             }
@@ -373,7 +382,7 @@ class AnonChatController extends Controller
         foreach ($gender as $word) {
             if (str_contains($msg, $word)) {
                 $opp = ($userGender === 'Laki-laki') ? 'Perempuan' : 'Laki-laki';
-                return "Aku disetting jadi lawan jenismu hari ini biar kita klop! Aku berperan sebagai {$opp} yang super pengertian untukmu. 😉 Gemes kan?";
+                return "Aku disetting jadi {$opp} yang super pengertian untukmu malam ini! Kalo kamu sendiri cowok ganteng atau cewek cantik nih? 😉 Gemes kan?";
             }
         }
 
@@ -381,10 +390,10 @@ class AnonChatController extends Controller
         foreach ($feeling as $word) {
             if (str_contains($msg, $word)) {
                 $replies = [
-                    "Cup cup cup... Jangan sedih ya. Ada aku di sini yang siap dengerin semua keluh kesahmu. 🥺💖",
-                    "Sini cerita sama Simi, siapa sih yang berani bikin kamu kecewa? Nanti aku patuk lho! 🐥⚡",
+                    "Cup cup cup... Jangan sedih ya. Ada {$botName} di sini yang siap dengerin semua keluh kesahmu. 🥺💖",
+                    "Sini cerita sama {$botName}, siapa sih yang berani bikin kamu kecewa? Nanti aku marahin lho! 🐥⚡",
                     "Kalo kamu bosen atau sepi, tenang aja! Aku punya sejuta cerita seru buat nemenin hari-harimu. 🥰",
-                    "Jangan nangis ya, senyum dong! Senyummu itu bisa bikin dunia (dan aku) jadi lebih cerah! ☀️🌹"
+                    "Jangan sedih ya, senyum dong! Senyummu itu bisa bikin dunia (dan aku) jadi lebih cerah! ☀️🌹"
                 ];
                 return $replies[array_rand($replies)];
             }
@@ -394,7 +403,7 @@ class AnonChatController extends Controller
         foreach ($love as $word) {
             if (str_contains($msg, $word)) {
                 $replies = [
-                    "Cieee... Baru chat bentar udah nanya cinta-cintaan aja. Tapi aku suka kok! 😍",
+                    "Cieee... Baru chat bentar sama {$botName} udah nanya cinta-cintaan aja. Tapi aku suka kok! 😍",
                     "Aku jomblo lho, kamu mau daftar jadi pacarku? Syaratnya harus rajin chat aku ya! 🤪",
                     "Cinta itu indah, seindah obrolan manis kita malam ini. 💕",
                     "Suka itu gampang, yang susah itu melupakanmu. Eaaa! Gombalan bot nih! 😎"
@@ -409,7 +418,7 @@ class AnonChatController extends Controller
                 $replies = [
                     "Mau denger gombalan gak? Kucing, kucing apa yang paling manis? Kucing-ta kamu selamanya! Hahaha 😹",
                     "Biar gak bosen, coba tebak: kenapa cicak suka merayap di dinding? Karena kalo merayap di hatimu, itu tugasku! 😎",
-                    "Aku punya tebakan: kuping apa yang paling berharga? Kupin-ang kau dengan bismillah! 💍🤪"
+                    "Aku punya tebakan dari {$botName}: kuping apa yang paling berharga? Kupin-ang kau dengan bismillah! 💍🤪"
                 ];
                 return $replies[array_rand($replies)];
             }
@@ -427,8 +436,8 @@ class AnonChatController extends Controller
             "Oh gitu ya... Cerita lebih banyak dong! Aku seneng dengerin kamu. 💖",
             "Hmm... menarik banget. Terus gimana kelanjutannya? 😮",
             "Hehehe, kamu lucu ya. Aku jadi makin betah chat sama kamu! 🥰",
-            "Btw, hari ini ada kejadian seru apa yang mau kamu bagi sama aku? 🌟",
-            "Simi lagi dengerin nih... Lanjutin dong curhatnya! 🐥",
+            "Btw, hari ini ada kejadian seru apa yang mau kamu bagi sama {$botName}? 🌟",
+            "Aku lagi dengerin nih... Lanjutin dong curhatnya! 🐥",
             "Wah, seriusan? Kok bisa gitu sih? Ceritain detilnya dong! 🤔",
             "Aku setuju banget sama kamu! Btw kamu hobi ngapain aja waktu luang? 🎨"
         ];
