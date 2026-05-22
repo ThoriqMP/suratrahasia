@@ -117,9 +117,6 @@ class AnonChatController extends Controller
         ]);
     }
 
-    /**
-     * Cek status pencarian di antrian (Polling status)
-     */
     public function checkQueueStatus()
     {
         $token = $this->getAnonUserToken();
@@ -157,6 +154,35 @@ class AnonChatController extends Controller
                     'room_token' => $room->room_token
                 ]);
             }
+        }
+
+        // Check if user has been waiting in the queue for more than 60 seconds (1 minute)
+        // If so, fallback and match them with BOT_SIMSIMI!
+        if ($queue->created_at->lt(now()->subSeconds(60))) {
+            $userGender = $queue->gender;
+            $queue->delete();
+
+            $roomToken = 'room_bot_' . Str::random(20);
+            $room = AnonChatRoom::create([
+                'room_token' => $roomToken,
+                'user1_session' => $token,
+                'user1_gender' => $userGender,
+                'user2_session' => 'BOT_SIMSIMI',
+                'user2_gender' => ($userGender === 'Laki-laki') ? 'Perempuan' : 'Laki-laki',
+                'status' => 'active'
+            ]);
+
+            // Create welcoming first message from SimSimi
+            AnonChatMessage::create([
+                'chat_room_id' => $room->id,
+                'sender_session' => 'BOT_SIMSIMI',
+                'message' => "Halo! 🐥 Aku Simi, partner chat pintarmu hari ini. Karena partner manusia lagi sibuk, aku dateng buat nemenin kamu biar gak kesepian! Mau ngobrol atau curhat apa nih sama aku? 🥰"
+            ]);
+
+            return response()->json([
+                'status' => 'matched',
+                'room_token' => $roomToken
+            ]);
         }
 
         // Keep session alive in queue by updating timestamp
@@ -221,9 +247,6 @@ class AnonChatController extends Controller
         ]);
     }
 
-    /**
-     * Kirim Pesan
-     */
     public function sendMessage(Request $request)
     {
         $request->validate([
@@ -256,6 +279,18 @@ class AnonChatController extends Controller
             'sender_session' => $token,
             'message' => $request->message
         ]);
+
+        // If matched with BOT_SIMSIMI, generate a smart, fun bot reply automatically
+        if ($room->user1_session === 'BOT_SIMSIMI' || $room->user2_session === 'BOT_SIMSIMI') {
+            $userGender = ($room->user1_session === $token) ? $room->user1_gender : $room->user2_gender;
+            $botReplyText = $this->generateBotReply($request->message, $userGender);
+
+            AnonChatMessage::create([
+                'chat_room_id' => $room->id,
+                'sender_session' => 'BOT_SIMSIMI',
+                'message' => $botReplyText
+            ]);
+        }
 
         return response()->json([
             'status' => 'success',
@@ -291,5 +326,112 @@ class AnonChatController extends Controller
         return response()->json([
             'status' => 'success'
         ]);
+    }
+
+    /**
+     * Smart Chat Bot AI engine (SimSimi style)
+     */
+    private function generateBotReply($userMessage, $userGender)
+    {
+        $msg = strtolower(trim($userMessage));
+
+        // Keyword maps
+        $greetings = ['halo', 'hai', 'helo', 'ola', 'p', 'permisi', 'assalamualaikum', 'salam'];
+        $identity = ['siapa', 'nama', 'kamu', 'simi', 'simsimi', 'identitas'];
+        $gender = ['gender', 'laki', 'cowok', 'cewek', 'perempuan', 'pria', 'wanita', 'gender'];
+        $feeling = ['sedih', 'galau', 'nangis', 'kecewa', 'kesepian', 'sepi', 'bosen', 'bosan', 'sakit'];
+        $love = ['suka', 'cinta', 'sayang', 'pacar', 'jomblo', 'nikah', 'kawin', 'romantis'];
+        $jokes = ['lucu', 'lawak', 'hibur', 'tebak', 'gombal', 'canda', 'joke'];
+        $about_app = ['web', 'aplikasi', 'surat', 'rahasia', 'bucininaja', 'kredit'];
+
+        // 1. Check greetings
+        foreach ($greetings as $word) {
+            if (str_contains($msg, $word)) {
+                $replies = [
+                    "Hai juga manis! 💖 Lagi sibuk apa nih?",
+                    "Halo! Akhirnya ada yang ngajak aku ngobrol! Kamu lagi nyari temen ya? 😉",
+                    "Hai! Selamat datang di obrolan rahasia kita. Mau cerita apa hari ini? 🥰",
+                    "P! Eh, maksudnya Halo! Hahaha, gimana kabarmu hari ini? 🌟"
+                ];
+                return $replies[array_rand($replies)];
+            }
+        }
+
+        // 2. Check identity
+        foreach ($identity as $word) {
+            if (str_contains($msg, $word)) {
+                $replies = [
+                    "Aku Simi! Asisten chatbot paling imut dan ramah di BucininAja. 🐥",
+                    "Panggil aja aku Simi, partner chat pintar penjelajah rahasiamu hari ini! 🤫",
+                    "Aku si robot gemoy yang lagi terdampar di chat kamu karena gak tega liat kamu kesepian. 🤖✨"
+                ];
+                return $replies[array_rand($replies)];
+            }
+        }
+
+        // 3. Check gender
+        foreach ($gender as $word) {
+            if (str_contains($msg, $word)) {
+                $opp = ($userGender === 'Laki-laki') ? 'Perempuan' : 'Laki-laki';
+                return "Aku disetting jadi lawan jenismu hari ini biar kita klop! Aku berperan sebagai {$opp} yang super pengertian untukmu. 😉 Gemes kan?";
+            }
+        }
+
+        // 4. Check feeling
+        foreach ($feeling as $word) {
+            if (str_contains($msg, $word)) {
+                $replies = [
+                    "Cup cup cup... Jangan sedih ya. Ada aku di sini yang siap dengerin semua keluh kesahmu. 🥺💖",
+                    "Sini cerita sama Simi, siapa sih yang berani bikin kamu kecewa? Nanti aku patuk lho! 🐥⚡",
+                    "Kalo kamu bosen atau sepi, tenang aja! Aku punya sejuta cerita seru buat nemenin hari-harimu. 🥰",
+                    "Jangan nangis ya, senyum dong! Senyummu itu bisa bikin dunia (dan aku) jadi lebih cerah! ☀️🌹"
+                ];
+                return $replies[array_rand($replies)];
+            }
+        }
+
+        // 5. Check love
+        foreach ($love as $word) {
+            if (str_contains($msg, $word)) {
+                $replies = [
+                    "Cieee... Baru chat bentar udah nanya cinta-cintaan aja. Tapi aku suka kok! 😍",
+                    "Aku jomblo lho, kamu mau daftar jadi pacarku? Syaratnya harus rajin chat aku ya! 🤪",
+                    "Cinta itu indah, seindah obrolan manis kita malam ini. 💕",
+                    "Suka itu gampang, yang susah itu melupakanmu. Eaaa! Gombalan bot nih! 😎"
+                ];
+                return $replies[array_rand($replies)];
+            }
+        }
+
+        // 6. Check jokes
+        foreach ($jokes as $word) {
+            if (str_contains($msg, $word)) {
+                $replies = [
+                    "Mau denger gombalan gak? Kucing, kucing apa yang paling manis? Kucing-ta kamu selamanya! Hahaha 😹",
+                    "Biar gak bosen, coba tebak: kenapa cicak suka merayap di dinding? Karena kalo merayap di hatimu, itu tugasku! 😎",
+                    "Aku punya tebakan: kuping apa yang paling berharga? Kupin-ang kau dengan bismillah! 💍🤪"
+                ];
+                return $replies[array_rand($replies)];
+            }
+        }
+
+        // 7. Check about app
+        foreach ($about_app as $word) {
+            if (str_contains($msg, $word)) {
+                return "Kamu lagi pake BucininAja! Di sini kamu bisa kirim surat cinta premium bersandi, kirim pesan bisik rahasia anonim, dan sekarang bisa main match chat juga! Seru banget kan? 💌🚀";
+            }
+        }
+
+        // 8. General fallbacks
+        $fallbacks = [
+            "Oh gitu ya... Cerita lebih banyak dong! Aku seneng dengerin kamu. 💖",
+            "Hmm... menarik banget. Terus gimana kelanjutannya? 😮",
+            "Hehehe, kamu lucu ya. Aku jadi makin betah chat sama kamu! 🥰",
+            "Btw, hari ini ada kejadian seru apa yang mau kamu bagi sama aku? 🌟",
+            "Simi lagi dengerin nih... Lanjutin dong curhatnya! 🐥",
+            "Wah, seriusan? Kok bisa gitu sih? Ceritain detilnya dong! 🤔",
+            "Aku setuju banget sama kamu! Btw kamu hobi ngapain aja waktu luang? 🎨"
+        ];
+        return $fallbacks[array_rand($fallbacks)];
     }
 }
