@@ -7,6 +7,7 @@ use App\Http\Controllers\AnonRoomController;
 use App\Http\Controllers\AnonMessageController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\AnonChatController;
 
 Route::get('/', [SuratController::class, 'index']);
 Route::get('/index', [SuratController::class, 'index']);
@@ -70,3 +71,12 @@ Route::get('/anon/{kode}', [AnonMessageController::class, 'showMessages'])->name
 
 // untuk menghapus pesan anonim
 Route::delete('/anon/message/{id}', [AnonMessageController::class, 'delete'])->name('anon.message.delete');
+
+// Fitur Obrolan Anonim (Gender Match Chat)
+Route::get('/anon-chat', [AnonChatController::class, 'index'])->name('anon-chat.index');
+Route::post('/anon-chat/join', [AnonChatController::class, 'joinQueue']);
+Route::get('/anon-chat/status', [AnonChatController::class, 'checkQueueStatus']);
+Route::post('/anon-chat/leave-queue', [AnonChatController::class, 'leaveQueue']);
+Route::get('/anon-chat/messages', [AnonChatController::class, 'getMessages']);
+Route::post('/anon-chat/send', [AnonChatController::class, 'sendMessage']);
+Route::post('/anon-chat/leave', [AnonChatController::class, 'endChat']);

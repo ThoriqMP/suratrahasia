@@ -93,6 +93,9 @@
                         <a href="/anon" class="text-sm font-semibold text-pink-400 hover:text-pink-300 transition-colors flex items-center gap-1">
                             <span>💬</span> Bisik Rahasia
                         </a>
+                        <a href="/anon-chat" class="text-sm font-semibold text-cyan-400 hover:text-cyan-300 transition-colors flex items-center gap-1">
+                            <span>💑</span> Chat Anonim
+                        </a>
                     @endif
                     
                     @auth
@@ -158,6 +161,10 @@
                 <a href="/anon" class="flex flex-col items-center gap-1 text-slate-300 hover:text-pink-400 transition-colors">
                     <span class="text-xl">💬</span>
                     <span class="text-[10px] font-bold uppercase tracking-wider">Bisik</span>
+                </a>
+                <a href="/anon-chat" class="flex flex-col items-center gap-1 text-slate-300 hover:text-cyan-400 transition-colors">
+                    <span class="text-xl">💑</span>
+                    <span class="text-[10px] font-bold uppercase tracking-wider">Match</span>
                 </a>
                 @endif
                 
