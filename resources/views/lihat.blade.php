@@ -97,6 +97,7 @@ function playConfetti() {
 
 /* Enhancing prose for the letter */
 .prose { color: #e2e8f0; }
+.prose.text-amber-900 { color: #78350f !important; }
 .prose p { margin-bottom: 1.5em; }
 </style>
 

@@ -72,24 +72,24 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <label class="cursor-pointer" @click="selectedTema = 'classic'">
                         <input type="radio" name="tema_desain" value="classic" class="sr-only" x-model="selectedTema">
-                        <div class="glass-card p-4 text-center border-2 transition-all rounded-xl"
-                             :class="selectedTema === 'classic' ? 'border-pink-500 bg-pink-500/10' : 'border-transparent'">
+                        <div class="theme-card p-4 text-center rounded-2xl transition-all duration-300"
+                             :class="selectedTema === 'classic' ? 'active-classic' : ''">
                             <span class="text-3xl block mb-2">🌸</span>
                             <p class="font-bold text-white text-sm">Classic Pink</p>
                         </div>
                     </label>
                     <label class="cursor-pointer" @click="selectedTema = 'neon'">
                         <input type="radio" name="tema_desain" value="neon" class="sr-only" x-model="selectedTema">
-                        <div class="glass-card p-4 text-center border-2 transition-all rounded-xl"
-                             :class="selectedTema === 'neon' ? 'border-purple-500 bg-purple-500/10' : 'border-transparent'">
+                        <div class="theme-card p-4 text-center rounded-2xl transition-all duration-300"
+                             :class="selectedTema === 'neon' ? 'active-neon' : ''">
                             <span class="text-3xl block mb-2">⚡</span>
                             <p class="font-bold text-white text-sm">Dark Neon</p>
                         </div>
                     </label>
                     <label class="cursor-pointer" @click="selectedTema = 'vintage'">
                         <input type="radio" name="tema_desain" value="vintage" class="sr-only" x-model="selectedTema">
-                        <div class="glass-card p-4 text-center border-2 transition-all rounded-xl"
-                             :class="selectedTema === 'vintage' ? 'border-amber-500 bg-amber-500/10' : 'border-transparent'">
+                        <div class="theme-card p-4 text-center rounded-2xl transition-all duration-300"
+                             :class="selectedTema === 'vintage' ? 'active-vintage' : ''">
                             <span class="text-3xl block mb-2">📜</span>
                             <p class="font-bold text-white text-sm">Vintage Paper</p>
                         </div>
@@ -163,6 +163,34 @@
         </div>
     </div>
 </div>
+
+<style>
+    .theme-card {
+        background: rgba(15, 23, 42, 0.45);
+        border: 2px solid rgba(255, 255, 255, 0.08);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+    }
+    .theme-card:hover {
+        border-color: rgba(255, 255, 255, 0.2);
+        transform: translateY(-3px);
+    }
+    .theme-card.active-classic {
+        border-color: #ec4899 !important;
+        background: rgba(236, 72, 153, 0.15) !important;
+        box-shadow: 0 0 25px rgba(236, 72, 153, 0.35) !important;
+    }
+    .theme-card.active-neon {
+        border-color: #a855f7 !important;
+        background: rgba(168, 85, 247, 0.15) !important;
+        box-shadow: 0 0 25px rgba(168, 85, 247, 0.35) !important;
+    }
+    .theme-card.active-vintage {
+        border-color: #f59e0b !important;
+        background: rgba(245, 158, 11, 0.15) !important;
+        box-shadow: 0 0 25px rgba(245, 158, 11, 0.35) !important;
+    }
+</style>
 
 @once
 @push('scripts')

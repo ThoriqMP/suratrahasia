@@ -138,6 +138,15 @@
                 </div>
             </template>
             
+            <!-- Typing Animation bubble -->
+            <div x-show="isTyping" class="flex justify-start" x-transition>
+                <div class="typing-bubble">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            </div>
+            
             <!-- Partner meninggalkan obrolan placeholder -->
             <div x-show="partnerStatus === 'ended'" class="p-4 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-2xl text-center text-xs font-bold space-y-3">
                 <p>🚪 Obrolan ini telah berakhir karena lawan bicara meninggalkan ruangan chat.</p>
@@ -179,6 +188,10 @@ function anonChat() {
         partnerStatus: 'active', // active, ended
         error: '',
         isLoading: false,
+        isTyping: false,
+        shownMessageIds: [],
+        typingQueue: [],
+        isTypingInProgress: false,
 
         init() {
             if (this.roomToken) {
@@ -260,6 +273,10 @@ function anonChat() {
             this.messages = [];
             this.newMessage = '';
             this.partnerStatus = 'active';
+            this.shownMessageIds = [];
+            this.typingQueue = [];
+            this.isTyping = false;
+            this.isTypingInProgress = false;
             
             // Poll for messages immediately and then periodically
             this.pollMessages();
@@ -273,14 +290,27 @@ function anonChat() {
                 let response = await fetch(`/anon-chat/messages?room_token=${this.roomToken}`);
                 let data = await response.json();
                 
-                // Track new messages to trigger autoscroll
-                const prevCount = this.messages.length;
-                this.messages = data.messages;
                 this.partnerStatus = data.partner_status;
                 
-                if (this.messages.length > prevCount) {
-                    this.scrollToBottom();
-                }
+                // Process messages list
+                const serverMessages = data.messages;
+                serverMessages.forEach(msg => {
+                    if (msg.is_mine || this.shownMessageIds.includes(msg.id)) {
+                        if (!this.messages.some(m => m.id === msg.id)) {
+                            this.messages.push(msg);
+                            if (!this.shownMessageIds.includes(msg.id)) {
+                                this.shownMessageIds.push(msg.id);
+                            }
+                            this.scrollToBottom();
+                        }
+                    } else {
+                        // Partner/Bot message that has not been shown/typed yet!
+                        if (!this.messages.some(m => m.id === msg.id) && !this.typingQueue.some(m => m.id === msg.id)) {
+                            this.typingQueue.push(msg);
+                            this.processTypingQueue();
+                        }
+                    }
+                });
 
                 if (data.room_status === 'ended') {
                     clearInterval(this.chatInterval);
@@ -288,6 +318,31 @@ function anonChat() {
             } catch (err) {
                 console.error('Poll messages error:', err);
             }
+        },
+
+        async processTypingQueue() {
+            if (this.isTypingInProgress || this.typingQueue.length === 0) return;
+
+            this.isTypingInProgress = true;
+            const nextMsg = this.typingQueue.shift();
+
+            // Show typing animation bubble
+            this.isTyping = true;
+            this.scrollToBottom();
+
+            // Calculate typing duration based on message length: 40ms per character, min 1000ms, max 3000ms
+            const delay = Math.min(3000, Math.max(1000, nextMsg.message.length * 40));
+
+            setTimeout(() => {
+                this.isTyping = false;
+                this.messages.push(nextMsg);
+                this.shownMessageIds.push(nextMsg.id);
+                this.scrollToBottom();
+
+                this.isTypingInProgress = false;
+                // Continue queue processing
+                this.processTypingQueue();
+            }, delay);
         },
 
         async sendMessage() {
@@ -312,6 +367,7 @@ function anonChat() {
                 
                 if (data.status === 'success') {
                     this.messages.push(data.message);
+                    this.shownMessageIds.push(data.message.id);
                     this.scrollToBottom();
                 }
             } catch (err) {
@@ -375,6 +431,35 @@ function anonChat() {
     
     [x-cloak] {
         display: none !important;
+    }
+
+    /* Typing Animation CSS */
+    .typing-bubble {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 12px 18px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 20px 20px 20px 4px;
+        width: fit-content;
+        align-self: flex-start;
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        margin-top: 4px;
+        margin-bottom: 4px;
+    }
+    .typing-dot {
+        width: 6px;
+        height: 6px;
+        background: #f472b6;
+        border-radius: 50%;
+        animation: bounce 1.4s infinite ease-in-out both;
+    }
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+    @keyframes bounce {
+        0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+        40% { transform: scale(1.2); opacity: 1; }
     }
 </style>
 
